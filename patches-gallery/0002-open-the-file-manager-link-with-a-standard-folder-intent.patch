@@ -1,0 +1,800 @@
+open the file manager link with a standard folder intent
+
+Smali changes of vendor_oplus_camera affb683, over baksmali --sequential-labels output.
+
+diff --git a/classes2/com/oplus/aiunit/vision/re9.smali b/classes2/com/oplus/aiunit/vision/re9.smali
+index 2d0842aa0cba76b298b96a7be89f95fc4221ce0d..d92f2e8e1de7323ace9b497874e0733ec7d79af4 100644
+--- a/classes2/com/oplus/aiunit/vision/re9.smali
++++ b/classes2/com/oplus/aiunit/vision/re9.smali
+@@ -382,7 +382,11 @@
+     invoke-static {p1, v0}, Lkotlin/jvm/internal/Intrinsics;->checkNotNullParameter(Ljava/lang/Object;Ljava/lang/String;)V
+ 
+     .line 12
+-    :try_start_b
++    invoke-static {p1}, Lcom/oplus/gallery/aosp/AospIntents;->adapt(Landroid/content/Intent;)Landroid/content/Intent;
++
++    move-result-object p1
++
++    :try_start_f
+     sget-object v0, Lkotlin/Result;->Companion:Lkotlin/Result$Companion;
+ 
+     .line 14
+@@ -395,12 +399,12 @@
+     invoke-static {p0}, Lkotlin/Result;->constructor-impl(Ljava/lang/Object;)Ljava/lang/Object;
+ 
+     move-result-object p0
+-    :try_end_16
+-    .catchall {:try_start_b .. :try_end_16} :catchall_17
++    :try_end_1a
++    .catchall {:try_start_f .. :try_end_1a} :catchall_1b
+ 
+-    goto :goto_22
++    goto :goto_26
+ 
+-    :catchall_17
++    :catchall_1b
+     move-exception p0
+ 
+     .line 25
+@@ -417,12 +421,12 @@
+     move-result-object p0
+ 
+     .line 35
+-    :goto_22
++    :goto_26
+     invoke-static {p0}, Lkotlin/Result;->exceptionOrNull-impl(Ljava/lang/Object;)Ljava/lang/Throwable;
+ 
+     move-result-object p0
+ 
+-    if-eqz p0, :cond_35
++    if-eqz p0, :cond_39
+ 
+     .line 41
+     invoke-virtual {p0}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+@@ -440,7 +444,7 @@
+     .line 51
+     invoke-static {p1, p0, v1, v0}, Lcom/oplus/aiunit/vision/b45;->a(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+ 
+-    :cond_35
++    :cond_39
+     return-void
+ .end method
+ 
+diff --git b/classes2/com/oplus/gallery/aosp/AospIntents.smali b/classes2/com/oplus/gallery/aosp/AospIntents.smali
+new file mode 100644
+index 0000000000000000000000000000000000000000..9be0c9773c4f187d3ce772d87d3f818b72b4d848
+--- /dev/null
++++ b/classes2/com/oplus/gallery/aosp/AospIntents.smali
+@@ -0,0 +1,257 @@
++.class public final Lcom/oplus/gallery/aosp/AospIntents;
++.super Ljava/lang/Object;
++.source "AospIntents.java"
++
++
++# static fields
++.field private static final AUTHORITY:Ljava/lang/String; = "com.android.externalstorage.documents"
++
++
++# direct methods
++.method private constructor <init>()V
++    .locals 0
++
++    .line 15
++    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
++
++    .line 16
++    return-void
++.end method
++
++.method public static adapt(Landroid/content/Intent;)Landroid/content/Intent;
++    .locals 2
++
++    .line 19
++    if-nez p0, :cond_4
++
++    .line 20
++    const/4 p0, 0x0
++
++    return-object p0
++
++    .line 22
++    :cond_4
++    invoke-virtual {p0}, Landroid/content/Intent;->getAction()Ljava/lang/String;
++
++    move-result-object v0
++
++    .line 23
++    const-string/jumbo v1, "oplus.intent.action.filemanager.BROWSER_FILE"
++
++    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-nez v1, :cond_1c
++
++    .line 24
++    const-string/jumbo v1, "oppo.filemanager.intent.action.BROWSER_FILE"
++
++    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_1b
++
++    goto :goto_1c
++
++    .line 28
++    :cond_1b
++    return-object p0
++
++    .line 25
++    :cond_1c
++    :goto_1c
++    const-string v0, "CurrentDir"
++
++    invoke-virtual {p0, v0}, Landroid/content/Intent;->getStringExtra(Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    invoke-static {v0}, Lcom/oplus/gallery/aosp/AospIntents;->browseFolder(Ljava/lang/String;)Landroid/content/Intent;
++
++    move-result-object v0
++
++    .line 26
++    if-eqz v0, :cond_29
++
++    move-object p0, v0
++
++    :cond_29
++    return-object p0
++.end method
++
++.method private static browseFolder(Ljava/lang/String;)Landroid/content/Intent;
++    .locals 5
++
++    .line 33
++    const/4 v0, 0x0
++
++    if-nez p0, :cond_4
++
++    .line 34
++    return-object v0
++
++    .line 37
++    :cond_4
++    new-instance v1, Ljava/io/File;
++
++    invoke-direct {v1, p0}, Ljava/io/File;-><init>(Ljava/lang/String;)V
++
++    .line 38
++    invoke-virtual {v1}, Ljava/io/File;->isFile()Z
++
++    move-result v2
++
++    if-eqz v2, :cond_19
++
++    invoke-virtual {v1}, Ljava/io/File;->getParent()Ljava/lang/String;
++
++    move-result-object v2
++
++    if-eqz v2, :cond_19
++
++    .line 39
++    invoke-virtual {v1}, Ljava/io/File;->getParent()Ljava/lang/String;
++
++    move-result-object p0
++
++    .line 41
++    :cond_19
++    invoke-static {}, Landroid/os/Environment;->getExternalStorageDirectory()Ljava/io/File;
++
++    move-result-object v1
++
++    invoke-virtual {v1}, Ljava/io/File;->getPath()Ljava/lang/String;
++
++    move-result-object v1
++
++    .line 42
++    invoke-virtual {p0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v2
++
++    const-string v3, "/"
++
++    if-nez v2, :cond_41
++
++    new-instance v2, Ljava/lang/StringBuilder;
++
++    invoke-direct {v2}, Ljava/lang/StringBuilder;-><init>()V
++
++    invoke-virtual {v2, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    move-result-object v2
++
++    invoke-virtual {v2, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    move-result-object v2
++
++    invoke-virtual {v2}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++
++    move-result-object v2
++
++    invoke-virtual {p0, v2}, Ljava/lang/String;->startsWith(Ljava/lang/String;)Z
++
++    move-result v2
++
++    if-nez v2, :cond_41
++
++    .line 43
++    return-object v0
++
++    .line 45
++    :cond_41
++    invoke-virtual {p0}, Ljava/lang/String;->length()I
++
++    move-result v2
++
++    invoke-virtual {v1}, Ljava/lang/String;->length()I
++
++    move-result v4
++
++    if-le v2, v4, :cond_56
++
++    invoke-virtual {v1}, Ljava/lang/String;->length()I
++
++    move-result v1
++
++    add-int/lit8 v1, v1, 0x1
++
++    invoke-virtual {p0, v1}, Ljava/lang/String;->substring(I)Ljava/lang/String;
++
++    move-result-object p0
++
++    goto :goto_58
++
++    :cond_56
++    const-string p0, ""
++
++    .line 46
++    :goto_58
++    invoke-virtual {p0, v3}, Ljava/lang/String;->endsWith(Ljava/lang/String;)Z
++
++    move-result v1
++
++    if-eqz v1, :cond_6a
++
++    .line 47
++    invoke-virtual {p0}, Ljava/lang/String;->length()I
++
++    move-result v1
++
++    add-int/lit8 v1, v1, -0x1
++
++    const/4 v2, 0x0
++
++    invoke-virtual {p0, v2, v1}, Ljava/lang/String;->substring(II)Ljava/lang/String;
++
++    move-result-object p0
++
++    goto :goto_58
++
++    .line 49
++    :cond_6a
++    new-instance v1, Ljava/lang/StringBuilder;
++
++    invoke-direct {v1}, Ljava/lang/StringBuilder;-><init>()V
++
++    const-string/jumbo v2, "primary:"
++
++    invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    move-result-object v1
++
++    invoke-virtual {v1, p0}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
++
++    move-result-object p0
++
++    invoke-virtual {p0}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
++
++    move-result-object p0
++
++    const-string v1, "com.android.externalstorage.documents"
++
++    invoke-static {v1, p0}, Landroid/provider/DocumentsContract;->buildDocumentUri(Ljava/lang/String;Ljava/lang/String;)Landroid/net/Uri;
++
++    move-result-object p0
++
++    .line 50
++    new-instance v1, Landroid/content/Intent;
++
++    const-string v2, "android.intent.action.VIEW"
++
++    invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
++
++    .line 51
++    const-string/jumbo v2, "vnd.android.document/directory"
++
++    invoke-virtual {v1, p0, v2}, Landroid/content/Intent;->setDataAndType(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;
++
++    .line 52
++    invoke-static {v1, v0}, Landroid/content/Intent;->createChooser(Landroid/content/Intent;Ljava/lang/CharSequence;)Landroid/content/Intent;
++
++    move-result-object p0
++
++    return-object p0
++.end method
+diff --git a/classes2/com/oplus/gallery/searchpage/d.smali b/classes2/com/oplus/gallery/searchpage/d.smali
+index 7fbb54161656c368c02ca428164912043c93deaf..1d5a85fc670bf29c1d7f4c1e5b6ac846daae69ef 100644
+--- a/classes2/com/oplus/gallery/searchpage/d.smali
++++ b/classes2/com/oplus/gallery/searchpage/d.smali
+@@ -95,11 +95,11 @@
+     .line 3
+     iget-object p0, p0, Lcom/oplus/gallery/searchpage/d;->a:Lcom/oplus/gallery/searchpage/e;
+ 
+-    if-eqz v0, :cond_3d1
++    if-eqz v0, :cond_3d2
+ 
+     const/4 v1, 0x1
+ 
+-    if-eq v0, v1, :cond_3c7
++    if-eq v0, v1, :cond_3c8
+ 
+     const/4 v2, 0x0
+ 
+@@ -124,13 +124,13 @@
+ 
+     if-eq v0, p1, :cond_1c
+ 
+-    goto/16 :goto_3d0
++    goto/16 :goto_3d1
+ 
+     .line 29
+     :cond_1c
+     iget-object p1, p0, Lcom/oplus/gallery/searchpage/e;->g:Lcom/oplus/gallery/searchpage/SearchRecommendFragment$SearchRecommendRecyclerViewAdapter;
+ 
+-    if-eqz p1, :cond_3d0
++    if-eqz p1, :cond_3d1
+ 
+     .line 33
+     iget-object p0, p0, Lcom/oplus/gallery/searchpage/e;->j:Ljava/util/concurrent/CopyOnWriteArrayList;
+@@ -318,7 +318,7 @@
+ 
+     move-result p0
+ 
+-    if-nez p0, :cond_3d0
++    if-nez p0, :cond_3d1
+ 
+     .line 180
+     invoke-virtual {p1}, Landroidx/recyclerview/widget/RecyclerView$Adapter;->notifyDataSetChanged()V
+@@ -334,9 +334,9 @@
+     .line 188
+     iget-object v0, p0, Lcom/oplus/gallery/searchpage/e;->g:Lcom/oplus/gallery/searchpage/SearchRecommendFragment$SearchRecommendRecyclerViewAdapter;
+ 
+-    if-eqz v0, :cond_3d0
++    if-eqz v0, :cond_3d1
+ 
+-    if-eqz p1, :cond_3d0
++    if-eqz p1, :cond_3d1
+ 
+     .line 194
+     const-string v0, "groupType"
+@@ -373,7 +373,7 @@
+     .line 218
+     check-cast p0, Lcom/oplus/gallery/searchpage/SearchRecommendFragment$SearchRecommendRecyclerViewAdapter$a;
+ 
+-    if-eqz p0, :cond_3d0
++    if-eqz p0, :cond_3d1
+ 
+     .line 222
+     invoke-virtual {p0, p1}, Landroidx/recyclerview/widget/RecyclerView$Adapter;->notifyItemChanged(I)V
+@@ -384,7 +384,7 @@
+     :cond_e2
+     iget-object p0, p0, Lcom/oplus/gallery/searchpage/e;->g:Lcom/oplus/gallery/searchpage/SearchRecommendFragment$SearchRecommendRecyclerViewAdapter;
+ 
+-    if-eqz p0, :cond_3d0
++    if-eqz p0, :cond_3d1
+ 
+     .line 230
+     iget-object p1, p1, Landroid/os/Message;->obj:Ljava/lang/Object;
+@@ -476,7 +476,7 @@
+ 
+     move-result p1
+ 
+-    if-eqz p1, :cond_3d0
++    if-eqz p1, :cond_3d1
+ 
+     .line 296
+     invoke-static {v0}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+@@ -584,7 +584,7 @@
+     .line 380
+     check-cast p0, Lcom/oplus/gallery/searchpage/SearchRecommendFragment$SearchRecommendRecyclerViewAdapter$a;
+ 
+-    if-eqz p0, :cond_3d0
++    if-eqz p0, :cond_3d1
+ 
+     .line 384
+     iget-object v1, p1, Lcom/oplus/gallery/searchpage/e$b;->d:Ljava/util/List;
+@@ -764,7 +764,7 @@
+     .line 517
+     iget-object p1, p0, Lcom/oplus/gallery/searchpage/e$b;->e:Lcom/oplus/gallery/searchpage/c;
+ 
+-    if-eqz p1, :cond_3d0
++    if-eqz p1, :cond_3d1
+ 
+     .line 521
+     iget v0, p0, Lcom/oplus/gallery/searchpage/e$b;->a:I
+@@ -831,7 +831,7 @@
+     .line 562
+     const-string v4, "SearchRecommendCoverLoader"
+ 
+-    if-eqz v0, :cond_39e
++    if-eqz v0, :cond_39f
+ 
+     .line 566
+     invoke-interface {v0}, Ljava/util/List;->isEmpty()Z
+@@ -840,7 +840,7 @@
+ 
+     if-eqz v5, :cond_240
+ 
+-    goto/16 :goto_39e
++    goto/16 :goto_39f
+ 
+     .line 574
+     :cond_240
+@@ -864,7 +864,7 @@
+     invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ 
+     .line 590
+-    const-string v6, "onLoaderGroup, load data size is "
++    const-string/jumbo v6, "onLoaderGroup, load data size is "
+ 
+     .line 592
+     invoke-virtual {v5, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+@@ -935,19 +935,19 @@
+     .line 645
+     iget-object v5, p1, Lcom/oplus/gallery/searchpage/c;->i:Ljava/util/List;
+ 
+-    if-eqz v5, :cond_37c
++    if-eqz v5, :cond_37d
+ 
+     .line 649
+     invoke-interface {v5}, Ljava/util/List;->size()I
+ 
+     move-result v5
+ 
+-    if-nez v5, :cond_293
++    if-nez v5, :cond_294
+ 
+-    goto/16 :goto_37c
++    goto/16 :goto_37d
+ 
+     .line 657
+-    :cond_293
++    :cond_294
+     new-instance v5, Ljava/util/ArrayList;
+ 
+     .line 659
+@@ -972,23 +972,23 @@
+ 
+     move-result v7
+ 
+-    if-eq v6, v7, :cond_2ab
++    if-eq v6, v7, :cond_2ac
+ 
+     move v8, v1
+ 
+-    goto :goto_2ac
++    goto :goto_2ad
+ 
+-    :cond_2ab
++    :cond_2ac
+     move v8, v2
+ 
+     .line 682
+-    :goto_2ac
++    :goto_2ad
+     invoke-static {v6, v7}, Ljava/lang/Math;->min(II)I
+ 
+     move-result v6
+ 
+-    :goto_2b0
+-    if-ge v2, v6, :cond_35f
++    :goto_2b1
++    if-ge v2, v6, :cond_360
+ 
+     .line 688
+     invoke-interface {v0, v2}, Ljava/util/List;->get(I)Ljava/lang/Object;
+@@ -1014,7 +1014,7 @@
+ 
+     cmp-long v10, v10, v12
+ 
+-    if-eqz v10, :cond_2ec
++    if-eqz v10, :cond_2ed
+ 
+     .line 708
+     new-instance v8, Ljava/lang/StringBuilder;
+@@ -1060,10 +1060,10 @@
+     .line 742
+     invoke-static {v4, v7}, Lcom/oplus/aiunit/vision/e1g;->u(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    goto :goto_330
++    goto :goto_331
+ 
+     .line 746
+-    :cond_2ec
++    :cond_2ed
+     iget v10, v7, Lcom/oplus/aiunit/vision/qhk;->h:F
+ 
+     .line 748
+@@ -1071,12 +1071,12 @@
+ 
+     cmpl-float v10, v10, v11
+ 
+-    if-eqz v10, :cond_2f5
++    if-eqz v10, :cond_2f6
+ 
+-    goto :goto_330
++    goto :goto_331
+ 
+     .line 755
+-    :cond_2f5
++    :cond_2f6
+     iget-object v10, v7, Lcom/oplus/aiunit/vision/qhk;->i:Ljava/lang/String;
+ 
+     .line 757
+@@ -1087,15 +1087,15 @@
+ 
+     move-result v10
+ 
+-    if-nez v10, :cond_300
++    if-nez v10, :cond_301
+ 
+-    goto :goto_330
++    goto :goto_331
+ 
+     .line 766
+-    :cond_300
++    :cond_301
+     iget-object v10, v9, Lcom/oplus/aiunit/vision/qhk;->a:Lcom/oplus/aiunit/vision/ium;
+ 
+-    if-nez v10, :cond_31b
++    if-nez v10, :cond_31c
+ 
+     .line 770
+     new-instance v7, Ljava/lang/StringBuilder;
+@@ -1123,13 +1123,13 @@
+     .line 789
+     invoke-static {v4, v7}, Lcom/oplus/aiunit/vision/e1g;->u(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    goto :goto_330
++    goto :goto_331
+ 
+     .line 793
+-    :cond_31b
++    :cond_31c
+     iget-object v10, v9, Lcom/oplus/aiunit/vision/qhk;->b:Ljava/lang/String;
+ 
+-    if-eqz v10, :cond_328
++    if-eqz v10, :cond_329
+ 
+     .line 797
+     iget-object v11, v7, Lcom/oplus/aiunit/vision/qhk;->b:Ljava/lang/String;
+@@ -1139,23 +1139,23 @@
+ 
+     move-result v10
+ 
+-    if-nez v10, :cond_328
++    if-nez v10, :cond_329
+ 
+-    goto :goto_330
++    goto :goto_331
+ 
+     .line 806
+-    :cond_328
++    :cond_329
+     iget-object v9, v9, Lcom/oplus/aiunit/vision/qhk;->b:Ljava/lang/String;
+ 
+-    if-nez v9, :cond_35b
++    if-nez v9, :cond_35c
+ 
+     .line 810
+     iget-object v7, v7, Lcom/oplus/aiunit/vision/qhk;->b:Ljava/lang/String;
+ 
+-    if-eqz v7, :cond_35b
++    if-eqz v7, :cond_35c
+ 
+     .line 814
+-    :goto_330
++    :goto_331
+     new-instance v7, Ljava/lang/StringBuilder;
+ 
+     .line 816
+@@ -1187,12 +1187,12 @@
+     .line 839
+     iget v7, p1, Lcom/oplus/gallery/searchpage/c;->f:I
+ 
+-    if-lt v2, v7, :cond_35a
++    if-lt v2, v7, :cond_35b
+ 
+     .line 843
+     iget v7, p1, Lcom/oplus/gallery/searchpage/c;->g:I
+ 
+-    if-ge v2, v7, :cond_35a
++    if-ge v2, v7, :cond_35b
+ 
+     .line 847
+     invoke-virtual {p1, v2}, Lcom/oplus/gallery/searchpage/c;->c(I)V
+@@ -1203,46 +1203,46 @@
+     .line 853
+     invoke-virtual {p1}, Lcom/oplus/gallery/searchpage/c;->g()V
+ 
+-    :cond_35a
++    :cond_35b
+     move v8, v1
+ 
+-    :cond_35b
++    :cond_35c
+     add-int/lit8 v2, v2, 0x1
+ 
+-    goto/16 :goto_2b0
++    goto/16 :goto_2b1
+ 
+     .line 861
+-    :cond_35f
++    :cond_360
+     iget v0, p1, Lcom/oplus/gallery/searchpage/c;->g:I
+ 
+-    if-ge v6, v0, :cond_373
++    if-ge v6, v0, :cond_374
+ 
+-    :goto_363
+-    if-ge v6, v0, :cond_36f
++    :goto_364
++    if-ge v6, v0, :cond_370
+ 
+     .line 867
+     iget v2, p1, Lcom/oplus/gallery/searchpage/c;->h:I
+ 
+-    if-ge v6, v2, :cond_36f
++    if-ge v6, v2, :cond_370
+ 
+     .line 871
+     invoke-virtual {p1, v6}, Lcom/oplus/gallery/searchpage/c;->d(I)V
+ 
+     add-int/lit8 v6, v6, 0x1
+ 
+-    goto :goto_363
++    goto :goto_364
+ 
+     .line 877
+-    :cond_36f
++    :cond_370
+     invoke-virtual {p1}, Lcom/oplus/gallery/searchpage/c;->g()V
+ 
+-    goto :goto_374
++    goto :goto_375
+ 
+-    :cond_373
++    :cond_374
+     move v1, v8
+ 
+-    :goto_374
+-    if-eqz v1, :cond_3d0
++    :goto_375
++    if-eqz v1, :cond_3d1
+ 
+     .line 884
+     check-cast v3, Lcom/oplus/gallery/searchpage/e;
+@@ -1253,8 +1253,8 @@
+     return-void
+ 
+     .line 890
+-    :cond_37c
+-    :goto_37c
++    :cond_37d
++    :goto_37d
+     iput-object v0, p1, Lcom/oplus/gallery/searchpage/c;->i:Ljava/util/List;
+ 
+     .line 892
+@@ -1263,18 +1263,18 @@
+     .line 894
+     iget v1, p1, Lcom/oplus/gallery/searchpage/c;->g:I
+ 
+-    :goto_382
+-    if-ge v0, v1, :cond_38a
++    :goto_383
++    if-ge v0, v1, :cond_38b
+ 
+     .line 898
+     invoke-virtual {p1, v0}, Lcom/oplus/gallery/searchpage/c;->d(I)V
+ 
+     add-int/lit8 v0, v0, 0x1
+ 
+-    goto :goto_382
++    goto :goto_383
+ 
+     .line 904
+-    :cond_38a
++    :cond_38b
+     invoke-virtual {p1}, Lcom/oplus/gallery/searchpage/c;->g()V
+ 
+     .line 907
+@@ -1282,7 +1282,7 @@
+ 
+     move-result v0
+ 
+-    if-nez v0, :cond_398
++    if-nez v0, :cond_399
+ 
+     .line 913
+     check-cast v3, Lcom/oplus/gallery/searchpage/e;
+@@ -1291,7 +1291,7 @@
+     invoke-virtual {v3, p0}, Lcom/oplus/gallery/searchpage/e;->d(Lcom/oplus/gallery/searchpage/e$b;)V
+ 
+     .line 918
+-    :cond_398
++    :cond_399
+     iget-object p0, p1, Lcom/oplus/gallery/searchpage/c;->i:Ljava/util/List;
+ 
+     .line 920
+@@ -1300,18 +1300,18 @@
+     return-void
+ 
+     .line 924
+-    :cond_39e
+-    :goto_39e
++    :cond_39f
++    :goto_39f
+     iget-object v0, p1, Lcom/oplus/gallery/searchpage/c;->i:Ljava/util/List;
+ 
+-    if-eqz v0, :cond_3ad
++    if-eqz v0, :cond_3ae
+ 
+     .line 928
+     invoke-interface {v0}, Ljava/util/List;->isEmpty()Z
+ 
+     move-result v0
+ 
+-    if-nez v0, :cond_3ad
++    if-nez v0, :cond_3ae
+ 
+     .line 934
+     check-cast v3, Lcom/oplus/gallery/searchpage/e;
+@@ -1320,7 +1320,7 @@
+     invoke-virtual {v3, p0}, Lcom/oplus/gallery/searchpage/e;->d(Lcom/oplus/gallery/searchpage/e$b;)V
+ 
+     .line 939
+-    :cond_3ad
++    :cond_3ae
+     invoke-virtual {p1}, Lcom/oplus/gallery/searchpage/c;->b()V
+ 
+     .line 942
+@@ -1352,10 +1352,10 @@
+     return-void
+ 
+     .line 965
+-    :cond_3c7
++    :cond_3c8
+     iget-object p0, p0, Lcom/oplus/gallery/searchpage/e;->f:Lcom/oplus/gallery/searchpage/SearchRecommendFragment$a;
+ 
+-    if-eqz p0, :cond_3d0
++    if-eqz p0, :cond_3d1
+ 
+     .line 969
+     iget-object p0, p0, Lcom/oplus/gallery/searchpage/SearchRecommendFragment$a;->a:Lcom/oplus/gallery/searchpage/SearchRecommendFragment;
+@@ -1363,12 +1363,12 @@
+     .line 971
+     invoke-virtual {p0}, Lcom/oplus/gallery/searchpage/SearchRecommendFragment;->i2()V
+ 
+-    :cond_3d0
+-    :goto_3d0
++    :cond_3d1
++    :goto_3d1
+     return-void
+ 
+     .line 975
+-    :cond_3d1
++    :cond_3d2
+     iget-object p0, p0, Lcom/oplus/gallery/searchpage/e;->f:Lcom/oplus/gallery/searchpage/SearchRecommendFragment$a;
+ 
+     return-void
