@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Permissions that OPLUS apps use to guard their components and to call each other. On
+     ColorOS / OxygenOS they are defined by the OPLUS framework resources package; nothing
+     defines them here, so a guarded component cannot be started by any other app. This
+     package has no code. It is signed with the platform key, as the OPLUS apps this tree
+     ships are, so they hold these permissions by signature.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.oplus.permissions.aosp"
+    android:versionCode="1"
+    android:versionName="1">
+
+    <uses-sdk android:minSdkVersion="33" android:targetSdkVersion="36" />
+
+    <permission android:name="com.heytap.accessory.permission.NOTIFICATION"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.heytap.mcs.permission.SEND_PUSH_MESSAGE"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.ASSISTANT"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.BACKUP"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.IOT"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.KEY_EVENT"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.PRIVATE"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.READ_COMMON"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.SECURITY"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oplus.permission.safe.SETTINGS"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oppo.permission.safe.PRIVATE"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="com.oppo.permission.safe.SECURITY"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="oplus.permission.OPLUS_COMPONENT_SAFE"
+        android:protectionLevel="signature|privileged" />
+    <permission android:name="oppo.permission.OPPO_COMPONENT_SAFE"
+        android:protectionLevel="signature|privileged" />
+
+    <application android:hasCode="false" android:label="OPLUS permissions" />
+</manifest>

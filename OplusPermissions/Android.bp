@@ -1,0 +1,11 @@
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+android_app {
+    name: "OplusPermissions",
+    manifest: "AndroidManifest.xml",
+    certificate: "platform",
+    sdk_version: "current",
+    system_ext_specific: true,
+}
