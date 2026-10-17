@@ -1,0 +1,5 @@
+type public_adsprpcd_file, file_type;
+
+# /data/vendor/camera_process: written by the camera app (per-user MLS level)
+# and by the camera HAL
+type vendor_oplus_camera_process_file, file_type, data_file_type, mlstrustedobject;

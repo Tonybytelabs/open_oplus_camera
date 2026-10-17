@@ -1,0 +1,45 @@
+# Same access as platform_app, the domain the camera ran in before.
+
+app_domain(opluscamera_app)
+net_domain(opluscamera_app)
+
+# Access to /data/media.
+allow opluscamera_app media_rw_data_file:dir create_dir_perms;
+allow opluscamera_app media_rw_data_file:file create_file_perms;
+
+# Direct access to vold-mounted storage under /mnt/media_rw
+allow opluscamera_app mnt_media_rw_file:dir r_dir_perms;
+allow opluscamera_app sdcard_type:dir create_dir_perms;
+allow opluscamera_app sdcard_type:file create_file_perms;
+
+allow opluscamera_app rootfs:dir getattr;
+allow opluscamera_app proc_vmstat:file r_file_perms;
+allow opluscamera_app app_data_file:lnk_file create_file_perms;
+
+get_prop(opluscamera_app, audio_config_prop)
+get_prop(opluscamera_app, keyguard_config_prop)
+get_prop(opluscamera_app, qemu_hw_prop)
+get_prop(opluscamera_app, vendor_persist_camera_prop)
+
+allow opluscamera_app app_api_service:service_manager find;
+allow opluscamera_app system_api_service:service_manager find;
+allow opluscamera_app audioserver_service:service_manager find;
+allow opluscamera_app cameraserver_service:service_manager find;
+allow opluscamera_app drmserver_service:service_manager find;
+allow opluscamera_app mediadrmserver_service:service_manager find;
+allow opluscamera_app mediaextractor_service:service_manager find;
+allow opluscamera_app mediametrics_service:service_manager find;
+allow opluscamera_app mediaserver_service:service_manager find;
+allow opluscamera_app nfc_service:service_manager find;
+allow opluscamera_app radio_service:service_manager find;
+allow opluscamera_app stats_service:service_manager find;
+allow opluscamera_app thermal_service:service_manager find;
+allow opluscamera_app vr_manager_service:service_manager find;
+allow opluscamera_app fwk_vibrator_control_service:service_manager find;
+
+# Log via statsd.
+binder_call(opluscamera_app, statsd)
+
+# UDP sockets provided by the system server, not modified other than to connect
+allow opluscamera_app system_server:udp_socket {
+        connect getattr read recvfrom sendto write getopt setopt };

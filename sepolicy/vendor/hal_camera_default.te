@@ -1,0 +1,9 @@
+allow hal_camera_default public_adsprpcd_file:file r_file_perms;
+allow hal_camera_default vendor_xdsp_device:chr_file r_file_perms;
+
+# Wakelock held by the postproc (YUV to JPEG) loop
+wakelock_use(hal_camera_default)
+
+# APS job and Live Photo store
+allow hal_camera_default vendor_oplus_camera_process_file:dir create_dir_perms;
+allow hal_camera_default vendor_oplus_camera_process_file:file create_file_perms;

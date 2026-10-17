@@ -1,0 +1,32 @@
+hal_client_domain(opluscamera_app, vendor_hal_dspmanager)
+
+allow opluscamera_app vendor_hal_orms_hwservice:hwservice_manager find;
+
+allow opluscamera_app adsprpcd_file:dir r_dir_perms;
+allow opluscamera_app vendor_qdsp_device:chr_file rw_file_perms;
+allow opluscamera_app vendor_xdsp_device:chr_file r_file_perms;
+
+allow opluscamera_app vendor_camera_data_file:dir create_dir_perms;
+allow opluscamera_app vendor_camera_data_file:file create_file_perms;
+r_dir_file(opluscamera_app, vendor_persist_camera_file)
+
+# Same vendor HAL access as platform_app
+hal_client_domain(opluscamera_app, vendor_hal_perf)
+hal_client_domain(opluscamera_app, vendor_hal_qspmhal)
+get_prop(opluscamera_app, vendor_mpctl_prop)
+
+# Hardware JPEG encoder (IPostProcService, a hal_camera hwservice).
+# Not hal_client_domain(): in the recovery policy it also adds the hal_camera
+# attribute itself, whose device and capability rules an app may not have.
+typeattribute opluscamera_app halclientdomain;
+typeattribute opluscamera_app hal_camera_client;
+
+# Osense
+hal_client_domain(opluscamera_app, vendor_hal_oplus_osense)
+
+# APS job and Live Photo store
+allow opluscamera_app vendor_oplus_camera_process_file:dir create_dir_perms;
+allow opluscamera_app vendor_oplus_camera_process_file:file create_file_perms;
+
+# libadsprpc watches its library search path for runtime log configuration
+allow opluscamera_app vendor_file:dir watch;
