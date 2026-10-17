@@ -15,6 +15,7 @@ patches and writes the result to `vendor/oplus/camera-blobs`, the private
 | `patches-gallery/` | com.oneplus.gallery 16.50.8 (`OppoGallery2.apk`) |
 | `patches-safe/` | OPLUS Private Safe 17.3.3 (`FileEncryption.apk`) |
 | `tools/smali_patch.py` | applies one of the patch directories to an APK or jar |
+| `tools/manifest_add_permission.py` | adds `<uses-permission>` entries to an APK's binary manifest |
 | `opluscamera.mk`, `configs/`, `init/`, `sepolicy/`, `OplusPermissions/` | build configuration |
 
 ## Sources
