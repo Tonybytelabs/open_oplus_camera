@@ -1,0 +1,641 @@
+show "HDR video" instead of "Dolby Vision" when "10-bit color" is off
+
+Smali changes of vendor_oplus_camera cd55f06, over baksmali --sequential-labels output.
+
+diff --git a/classes/com/oplus/camera/configure/CameraConfig.smali b/classes/com/oplus/camera/configure/CameraConfig.smali
+index 4d93ab23e95cc477c84e935ee84685edec7a7628..11eae48447049351a420805a9145d018b08e7759 100644
+--- a/classes/com/oplus/camera/configure/CameraConfig.smali
++++ b/classes/com/oplus/camera/configure/CameraConfig.smali
+@@ -4026,7 +4026,46 @@
+ .method public static getConfigBooleanValue(Ljava/lang/String;)Z
+     .locals 5
+ 
++    const-string v0, "com.oplus.feature.video.dv.support"
++
++    invoke-virtual {v0, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-nez v1, :cond_18
++
++    const-string v1, "com.oplus.feature.video.hlg10.support"
++
++    invoke-virtual {v1, p0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-eqz v1, :cond_20
++
++    invoke-static {}, Lmm/DV;->tenBit()Z
++
++    move-result v1
++
++    if-nez v1, :cond_20
++
++    move-object p0, v0
++
++    goto :goto_20
++
++    :cond_18
++    invoke-static {}, Lmm/DV;->tenBit()Z
++
++    move-result v1
++
++    if-nez v1, :cond_20
++
++    const/4 v0, 0x0
++
++    return v0
++
+     .line 1
++    :cond_20
++    :goto_20
+     sget-object v0, Lcom/oplus/camera/configure/CameraConfig;->d:Ljava/util/concurrent/ConcurrentHashMap;
+ 
+     .line 3
+@@ -4037,7 +4076,7 @@
+     .line 7
+     check-cast v1, Ljava/lang/Boolean;
+ 
+-    if-eqz v1, :cond_f
++    if-eqz v1, :cond_2f
+ 
+     .line 11
+     invoke-virtual {v1}, Ljava/lang/Boolean;->booleanValue()Z
+@@ -4046,7 +4085,7 @@
+ 
+     return p0
+ 
+-    :cond_f
++    :cond_2f
+     const/4 v1, 0x0
+ 
+     .line 17
+@@ -4059,12 +4098,12 @@
+ 
+     move-result v3
+ 
+-    if-nez v3, :cond_4f
++    if-nez v3, :cond_6f
+ 
+     const/4 v3, 0x1
+ 
+     .line 28
+-    :try_start_1b
++    :try_start_3b
+     const-string/jumbo v4, "true"
+ 
+     .line 30
+@@ -4072,7 +4111,7 @@
+ 
+     move-result v4
+ 
+-    if-nez v4, :cond_39
++    if-nez v4, :cond_59
+ 
+     .line 36
+     const-string v4, "false"
+@@ -4082,31 +4121,31 @@
+ 
+     move-result v4
+ 
+-    if-eqz v4, :cond_2d
++    if-eqz v4, :cond_4d
+ 
+-    goto :goto_39
++    goto :goto_59
+ 
+     .line 45
+-    :cond_2d
++    :cond_4d
+     invoke-static {v2}, Ljava/lang/Byte;->parseByte(Ljava/lang/String;)B
+ 
+     move-result v2
+ 
+-    if-lez v2, :cond_34
++    if-lez v2, :cond_54
+ 
+     move v1, v3
+ 
+     .line 52
+-    :cond_34
++    :cond_54
+     invoke-static {v1}, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+ 
+     move-result-object v1
+ 
+-    goto :goto_41
++    goto :goto_61
+ 
+     .line 57
+-    :cond_39
+-    :goto_39
++    :cond_59
++    :goto_59
+     invoke-static {v2}, Ljava/lang/Boolean;->parseBoolean(Ljava/lang/String;)Z
+ 
+     move-result v1
+@@ -4117,20 +4156,20 @@
+     move-result-object v1
+ 
+     .line 65
+-    :goto_41
++    :goto_61
+     invoke-virtual {v0, p0, v1}, Ljava/util/concurrent/ConcurrentHashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ 
+     .line 68
+     invoke-virtual {v1}, Ljava/lang/Boolean;->booleanValue()Z
+ 
+     move-result p0
+-    :try_end_48
+-    .catch Ljava/lang/Exception; {:try_start_1b .. :try_end_48} :catch_49
++    :try_end_68
++    .catch Ljava/lang/Exception; {:try_start_3b .. :try_end_68} :catch_69
+ 
+     return p0
+ 
+     .line 73
+-    :catch_49
++    :catch_69
+     sget-object v1, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
+ 
+     .line 75
+@@ -4139,7 +4178,7 @@
+     return v3
+ 
+     .line 79
+-    :cond_4f
++    :cond_6f
+     sget-object v2, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
+ 
+     .line 81
+diff --git a/classes/ma/d0.smali b/classes/ma/d0.smali
+index 64cf8e55b8dd45f87b64a946fba42cdaf0860121..24f6225e7eaa13ca51f1ab4eb6e5318ec2343e1e 100644
+--- a/classes/ma/d0.smali
++++ b/classes/ma/d0.smali
+@@ -2408,6 +2408,8 @@
+ .method public final onResume()V
+     .locals 8
+ 
++    invoke-static {p0}, Lmm/DV;->resume(Landroid/app/Activity;)V
++
+     .line 1
+     invoke-static {}, Ljava/lang/System;->currentTimeMillis()J
+ 
+@@ -2456,7 +2458,7 @@
+     const/4 v1, 0x1
+ 
+     .line 24
+-    if-gez v0, :cond_1c
++    if-gez v0, :cond_1f
+ 
+     .line 25
+     .line 26
+@@ -2465,7 +2467,7 @@
+     .line 27
+     .line 28
+     .line 29
+-    :cond_1c
++    :cond_1f
+     sput-boolean v1, Lia/y0;->w:Z
+ 
+     .line 30
+@@ -2652,7 +2654,7 @@
+     move-result v2
+ 
+     .line 127
+-    if-eqz v2, :cond_85
++    if-eqz v2, :cond_88
+ 
+     .line 128
+     .line 129
+@@ -2665,7 +2667,7 @@
+     .line 132
+     .line 133
+     .line 134
+-    :cond_85
++    :cond_88
+     invoke-static {}, Landroid/view/Choreographer;->getInstance()Landroid/view/Choreographer;
+ 
+     .line 135
+@@ -2700,22 +2702,22 @@
+     move-result v5
+ 
+     .line 152
+-    if-lez v5, :cond_9b
++    if-lez v5, :cond_9e
+ 
+     .line 153
+     .line 154
+     move v5, v1
+ 
+     .line 155
+-    goto :goto_9c
++    goto :goto_9f
+ 
+     .line 156
+-    :cond_9b
++    :cond_9e
+     move v5, v3
+ 
+     .line 157
+-    :goto_9c
+-    if-eqz v5, :cond_b3
++    :goto_9f
++    if-eqz v5, :cond_b6
+ 
+     .line 158
+     .line 159
+@@ -2758,13 +2760,13 @@
+     .line 178
+     .line 179
+     .line 180
+-    :cond_b3
++    :cond_b6
+     invoke-virtual {v2, p0}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+ 
+     .line 181
+     .line 182
+     .line 183
+-    if-eqz v5, :cond_d6
++    if-eqz v5, :cond_d9
+ 
+     .line 184
+     .line 185
+@@ -2784,7 +2786,7 @@
+     move-result v0
+ 
+     .line 193
+-    if-eqz v0, :cond_c9
++    if-eqz v0, :cond_cc
+ 
+     .line 194
+     .line 195
+@@ -2801,7 +2803,7 @@
+     .line 200
+     .line 201
+     .line 202
+-    :cond_c9
++    :cond_cc
+     iput v1, p0, Lma/d0;->Q:I
+ 
+     .line 203
+@@ -2827,7 +2829,7 @@
+     return-void
+ 
+     .line 215
+-    :cond_d6
++    :cond_d9
+     invoke-static {p0}, Lia/s3;->e(Landroid/content/Context;)Z
+ 
+     .line 216
+@@ -2836,7 +2838,7 @@
+     move-result v2
+ 
+     .line 219
+-    if-eqz v2, :cond_114
++    if-eqz v2, :cond_117
+ 
+     .line 220
+     .line 221
+@@ -2844,7 +2846,7 @@
+ 
+     .line 222
+     .line 223
+-    if-nez v2, :cond_114
++    if-nez v2, :cond_117
+ 
+     .line 224
+     .line 225
+@@ -2856,7 +2858,7 @@
+     move-result v2
+ 
+     .line 229
+-    if-eqz v2, :cond_114
++    if-eqz v2, :cond_117
+ 
+     .line 230
+     .line 231
+@@ -2868,7 +2870,7 @@
+ 
+     .line 234
+     .line 235
+-    if-nez v1, :cond_f2
++    if-nez v1, :cond_f5
+ 
+     .line 236
+     .line 237
+@@ -2884,12 +2886,12 @@
+ 
+     .line 242
+     .line 243
+-    :cond_f2
++    :cond_f5
+     iget-object v1, p0, Lma/d0;->R:Landroid/app/KeyguardManager;
+ 
+     .line 244
+     .line 245
+-    if-eqz v1, :cond_ff
++    if-eqz v1, :cond_102
+ 
+     .line 246
+     .line 247
+@@ -2901,7 +2903,7 @@
+     move-result v1
+ 
+     .line 251
+-    if-eqz v1, :cond_ff
++    if-eqz v1, :cond_102
+ 
+     .line 252
+     .line 253
+@@ -2909,15 +2911,15 @@
+ 
+     .line 254
+     .line 255
+-    goto :goto_101
++    goto :goto_104
+ 
+     .line 256
+-    :cond_ff
++    :cond_102
+     const-wide/16 v1, 0xf
+ 
+     .line 257
+     .line 258
+-    :goto_101
++    :goto_104
+     new-instance v5, Lma/z;
+ 
+     .line 259
+@@ -2950,10 +2952,10 @@
+     .line 274
+     .line 275
+     .line 276
+-    goto :goto_123
++    goto :goto_126
+ 
+     .line 277
+-    :cond_114
++    :cond_117
+     const-string v1, "onResume --> onResumeTasks()"
+ 
+     .line 278
+@@ -2981,7 +2983,7 @@
+     .line 290
+     .line 291
+     .line 292
+-    :goto_123
++    :goto_126
+     invoke-super {p0}, Landroidx/fragment/app/s;->onResume()V
+ 
+     .line 293
+diff --git a/classes7/mm/DV.smali b/classes7/mm/DV.smali
+index a97ad433a7a2dd3a8495b2f0c27c7c379f048f04..56f1d36ac61bfb8d49da17338953c80ebd0a4a49 100644
+--- a/classes7/mm/DV.smali
++++ b/classes7/mm/DV.smali
+@@ -6,6 +6,10 @@
+ # static fields
+ .field static final RPU:[B
+ 
++.field static last:Z
++
++.field static seen:Z
++
+ 
+ # direct methods
+ .method static constructor <clinit>()V
+@@ -469,10 +473,10 @@
+ .method public static in(Lmm/i;)V
+     .locals 3
+ 
+-    .line 27
++    .line 41
+     iget-object v0, p0, Lmm/i;->h0:Landroid/media/MediaFormat;
+ 
+-    .line 28
++    .line 42
+     if-eqz v0, :cond_28
+ 
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+@@ -483,7 +487,7 @@
+ 
+     goto :goto_28
+ 
+-    .line 29
++    .line 43
+     :cond_b
+     const-string p0, "profile"
+ 
+@@ -491,34 +495,34 @@
+ 
+     invoke-virtual {v0, p0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 30
++    .line 44
+     const-string p0, "level"
+ 
+     invoke-virtual {v0, p0}, Landroid/media/MediaFormat;->removeKey(Ljava/lang/String;)V
+ 
+-    .line 31
++    .line 45
+     const-string p0, "color-standard"
+ 
+     const/4 v2, 0x6
+ 
+     invoke-virtual {v0, p0, v2}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 32
++    .line 46
+     const-string p0, "color-transfer"
+ 
+     const/4 v2, 0x7
+ 
+     invoke-virtual {v0, p0, v2}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 33
++    .line 47
+     const-string p0, "color-range"
+ 
+     invoke-virtual {v0, p0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 34
++    .line 48
+     return-void
+ 
+-    .line 28
++    .line 42
+     :cond_28
+     :goto_28
+     return-void
+@@ -527,7 +531,7 @@
+ .method public static out(Lmm/i;Landroid/media/MediaFormat;)V
+     .locals 3
+ 
+-    .line 37
++    .line 51
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+@@ -550,39 +554,74 @@
+ 
+     goto :goto_29
+ 
+-    .line 38
++    .line 52
+     :cond_15
+     const-string v0, "video/dolby-vision"
+ 
+     invoke-virtual {p1, v1, v0}, Landroid/media/MediaFormat;->setString(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    .line 39
++    .line 53
+     const-string v0, "profile"
+ 
+     const/16 v1, 0x100
+ 
+     invoke-virtual {p1, v0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 40
++    .line 54
+     const-string v0, "level"
+ 
+     iget p0, p0, Lmm/i;->g1:I
+ 
+     invoke-virtual {p1, v0, p0}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 41
++    .line 55
+     return-void
+ 
+-    .line 37
++    .line 51
+     :cond_29
+     :goto_29
+     return-void
+ .end method
+ 
++.method public static resume(Landroid/app/Activity;)V
++    .locals 2
++
++    .line 35
++    invoke-static {}, Lmm/DV;->tenBit()Z
++
++    move-result v0
++
++    .line 36
++    sget-boolean v1, Lmm/DV;->seen:Z
++
++    if-eqz v1, :cond_12
++
++    sget-boolean v1, Lmm/DV;->last:Z
++
++    if-eq v0, v1, :cond_12
++
++    sput-boolean v0, Lmm/DV;->last:Z
++
++    invoke-virtual {p0}, Landroid/app/Activity;->recreate()V
++
++    return-void
++
++    .line 37
++    :cond_12
++    const/4 p0, 0x1
++
++    sput-boolean p0, Lmm/DV;->seen:Z
++
++    sput-boolean v0, Lmm/DV;->last:Z
++
++    .line 38
++    return-void
++.end method
++
+ .method public static sample(Lmm/i;ILjava/nio/ByteBuffer;Landroid/media/MediaCodec$BufferInfo;)Ljava/nio/ByteBuffer;
+     .locals 6
+ 
+-    .line 44
++    .line 58
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+@@ -605,7 +644,7 @@
+ 
+     goto :goto_4c
+ 
+-    .line 45
++    .line 59
+     :cond_15
+     iget p0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+ 
+@@ -619,12 +658,12 @@
+ 
+     move-result-object p0
+ 
+-    .line 46
++    .line 60
+     invoke-virtual {p2}, Ljava/nio/ByteBuffer;->duplicate()Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+ 
+-    .line 47
++    .line 61
+     iget p2, p3, Landroid/media/MediaCodec$BufferInfo;->offset:I
+ 
+     iget v0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+@@ -639,7 +678,7 @@
+ 
+     invoke-virtual {p2, v0}, Ljava/nio/ByteBuffer;->position(I)Ljava/nio/ByteBuffer;
+ 
+-    .line 48
++    .line 62
+     invoke-virtual {p0, p1}, Ljava/nio/ByteBuffer;->put(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+@@ -652,7 +691,7 @@
+ 
+     invoke-virtual {p1}, Ljava/nio/ByteBuffer;->flip()Ljava/nio/ByteBuffer;
+ 
+-    .line 49
++    .line 63
+     invoke-virtual {p0}, Ljava/nio/ByteBuffer;->limit()I
+ 
+     move-result v2
+@@ -667,15 +706,36 @@
+ 
+     invoke-virtual/range {v0 .. v5}, Landroid/media/MediaCodec$BufferInfo;->set(IIJI)V
+ 
+-    .line 50
++    .line 64
+     return-object p0
+ 
+-    .line 44
++    .line 58
+     :cond_4c
+     :goto_4c
+     return-object p2
+ .end method
+ 
++.method public static tenBit()Z
++    .locals 1
++
++    .line 28
++    :try_start_0
++    invoke-static {}, Lom/t0;->tenBitPref()Z
++
++    move-result v0
++    :try_end_4
++    .catchall {:try_start_0 .. :try_end_4} :catchall_5
++
++    return v0
++
++    :catchall_5
++    move-exception v0
++
++    const/4 v0, 0x1
++
++    return v0
++.end method
++
+ .method public static want(Lom/t0;)Z
+     .locals 5
+ 
