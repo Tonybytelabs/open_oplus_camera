@@ -1,0 +1,47 @@
+record 8K in 10 bits when "10-bit color" is on
+
+Smali changes of vendor_oplus_camera 189d6c4, over baksmali --sequential-labels output.
+
+diff --git a/classes7/om/t0.smali b/classes7/om/t0.smali
+index b4da97583a3587de2aaa252b569199d4e4bcf045..d63a58c01b035f49a2934a89695aa35e416dfc7d 100644
+--- a/classes7/om/t0.smali
++++ b/classes7/om/t0.smali
+@@ -2005,13 +2005,7 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_21
+-
+-    invoke-virtual {p0}, Lcom/oplus/camera/module/BaseMode;->t()Z
+-
+-    move-result v0
+-
+-    if-nez v0, :cond_1f
++    if-eqz v0, :cond_1b
+ 
+     invoke-virtual {p0}, Lcom/oplus/camera/module/BaseMode;->Sa()Ljava/lang/String;
+ 
+@@ -2023,7 +2017,7 @@
+ 
+     move-result v0
+ 
+-    if-nez v0, :cond_1f
++    if-nez v0, :cond_19
+ 
+     invoke-static {}, Lom/t0;->tenBitPref()Z
+ 
+@@ -2031,12 +2025,12 @@
+ 
+     return v0
+ 
+-    :cond_1f
++    :cond_19
+     const/4 v0, 0x0
+ 
+     return v0
+ 
+-    :cond_21
++    :cond_1b
+     invoke-virtual {p0}, Lcom/oplus/camera/module/BaseMode;->Se()Z
+ 
+     move-result v0
