@@ -1,0 +1,580 @@
+record Dolby Vision only when "10-bit color" is on
+
+Smali changes of vendor_oplus_camera 5d2937d, over baksmali --sequential-labels output.
+
+diff --git a/classes7/com/oplus/camera/module/a.smali b/classes7/com/oplus/camera/module/a.smali
+index acb8ebfb8b1aeea94a26931d5e06787ecddea4e1..02a9b10bec6db8b8f2fd11010eeb0eed687a92ff 100644
+--- a/classes7/com/oplus/camera/module/a.smali
++++ b/classes7/com/oplus/camera/module/a.smali
+@@ -32751,7 +32751,7 @@
+     move-result v2
+ 
+     .line 694
+-    if-eqz v2, :cond_2e6
++    if-eqz v2, :cond_2ec
+ 
+     .line 695
+     .line 696
+@@ -32763,7 +32763,7 @@
+     move-result v2
+ 
+     .line 700
+-    if-eqz v2, :cond_2e6
++    if-eqz v2, :cond_2ec
+ 
+     .line 701
+     .line 702
+@@ -32779,10 +32779,14 @@
+     move-result v2
+ 
+     .line 708
+-    if-eqz v2, :cond_2cf
++    if-eqz v2, :cond_2d5
++
++    invoke-static {}, Lom/t0;->tenBitPref()Z
++
++    move-result v2
++
++    if-eqz v2, :cond_2ec
+ 
+-    .line 709
+-    .line 710
+     sget-object v2, Lcom/oplus/ocs/camera/CameraParameter;->VIDEO_DOLBY_MODE:Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;
+ 
+     .line 711
+@@ -32800,10 +32804,10 @@
+     .line 717
+     .line 718
+     .line 719
+-    goto :goto_2e6
++    goto :goto_2ec
+ 
+     .line 720
+-    :cond_2cf
++    :cond_2d5
+     const-string v2, "com.oplus.feature.video.hlg10.support"
+ 
+     .line 721
+@@ -32816,13 +32820,13 @@
+     move-result v2
+ 
+     .line 726
+-    if-eqz v2, :cond_2e6
++    if-eqz v2, :cond_2ec
+ 
+     invoke-static {}, Lom/t0;->tenBitPref()Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_2e6
++    if-eqz v2, :cond_2ec
+ 
+     sget-object v2, Lcom/oplus/ocs/camera/CameraParameter;->VIDEO_HLG10_MODE:Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;
+ 
+@@ -32841,8 +32845,8 @@
+     .line 735
+     .line 736
+     .line 737
+-    :cond_2e6
+-    :goto_2e6
++    :cond_2ec
++    :goto_2ec
+     const-string v2, "func_enhancement_video"
+ 
+     .line 738
+@@ -32855,7 +32859,7 @@
+     move-result v2
+ 
+     .line 743
+-    if-eqz v2, :cond_303
++    if-eqz v2, :cond_309
+ 
+     .line 744
+     .line 745
+@@ -32867,7 +32871,7 @@
+     move-result v2
+ 
+     .line 749
+-    if-eqz v2, :cond_303
++    if-eqz v2, :cond_309
+ 
+     .line 750
+     .line 751
+@@ -32899,14 +32903,14 @@
+     .line 763
+     .line 764
+     .line 765
+-    goto :goto_304
++    goto :goto_30a
+ 
+     .line 766
+-    :cond_303
++    :cond_309
+     const/4 v3, 0x1
+ 
+     .line 767
+-    :goto_304
++    :goto_30a
+     const-string v2, "func_video_aicolor"
+ 
+     .line 768
+@@ -32919,7 +32923,7 @@
+     move-result v2
+ 
+     .line 773
+-    if-eqz v2, :cond_31b
++    if-eqz v2, :cond_321
+ 
+     .line 774
+     .line 775
+@@ -32931,7 +32935,7 @@
+     move-result v2
+ 
+     .line 779
+-    if-eqz v2, :cond_31b
++    if-eqz v2, :cond_321
+ 
+     .line 780
+     .line 781
+@@ -32952,7 +32956,7 @@
+     .line 788
+     .line 789
+     .line 790
+-    :cond_31b
++    :cond_321
+     const-string v2, "pref_camera_global_ev_key"
+ 
+     .line 791
+@@ -32965,7 +32969,7 @@
+     move-result v2
+ 
+     .line 796
+-    if-eqz v2, :cond_362
++    if-eqz v2, :cond_368
+ 
+     .line 797
+     .line 798
+@@ -32985,7 +32989,7 @@
+     move-result v2
+ 
+     .line 806
+-    if-nez v2, :cond_362
++    if-nez v2, :cond_368
+ 
+     .line 807
+     .line 808
+@@ -32997,7 +33001,7 @@
+     move-result v2
+ 
+     .line 812
+-    if-eqz v2, :cond_362
++    if-eqz v2, :cond_368
+ 
+     .line 813
+     .line 814
+@@ -33048,7 +33052,7 @@
+     move-result v2
+ 
+     .line 837
+-    if-eqz v2, :cond_362
++    if-eqz v2, :cond_368
+ 
+     .line 838
+     .line 839
+@@ -33094,7 +33098,7 @@
+     .line 859
+     .line 860
+     .line 861
+-    :cond_362
++    :cond_368
+     invoke-virtual/range {p0 .. p0}, Lcom/oplus/camera/module/a;->Ad()Z
+ 
+     .line 862
+@@ -33103,7 +33107,7 @@
+     move-result v1
+ 
+     .line 865
+-    if-eqz v1, :cond_394
++    if-eqz v1, :cond_39a
+ 
+     .line 866
+     .line 867
+@@ -33139,7 +33143,7 @@
+     move-result v2
+ 
+     .line 883
+-    if-nez v2, :cond_382
++    if-nez v2, :cond_388
+ 
+     .line 884
+     .line 885
+@@ -33151,21 +33155,21 @@
+     move-result v1
+ 
+     .line 889
+-    if-eqz v1, :cond_382
++    if-eqz v1, :cond_388
+ 
+     .line 890
+     .line 891
+     move v6, v3
+ 
+     .line 892
+-    goto :goto_383
++    goto :goto_389
+ 
+     .line 893
+-    :cond_382
++    :cond_388
+     const/4 v6, 0x0
+ 
+     .line 894
+-    :goto_383
++    :goto_389
+     invoke-static {v6}, Ljava/lang/Boolean;->valueOf(Z)Ljava/lang/Boolean;
+ 
+     .line 895
+@@ -33199,7 +33203,7 @@
+     .line 909
+     .line 910
+     .line 911
+-    :cond_394
++    :cond_39a
+     invoke-static {}, Lia/z2;->q()Z
+ 
+     .line 912
+@@ -33208,7 +33212,7 @@
+     move-result v1
+ 
+     .line 915
+-    if-eqz v1, :cond_3a9
++    if-eqz v1, :cond_3af
+ 
+     .line 916
+     .line 917
+@@ -33220,7 +33224,7 @@
+     move-result v1
+ 
+     .line 921
+-    if-nez v1, :cond_3a9
++    if-nez v1, :cond_3af
+ 
+     .line 922
+     .line 923
+@@ -33241,7 +33245,7 @@
+     .line 930
+     .line 931
+     .line 932
+-    :cond_3a9
++    :cond_3af
+     sget-object v1, Lcom/oplus/ocs/camera/CameraParameter;->QUICK_MULTI_VIDEO_ENABLE:Lcom/oplus/ocs/camera/CameraParameter$ConfigureKey;
+ 
+     .line 933
+@@ -33254,21 +33258,21 @@
+     move-result v0
+ 
+     .line 938
+-    if-eqz v0, :cond_3b3
++    if-eqz v0, :cond_3b9
+ 
+     .line 939
+     .line 940
+     move-object v5, v7
+ 
+     .line 941
+-    goto :goto_3b4
++    goto :goto_3ba
+ 
+     .line 942
+-    :cond_3b3
++    :cond_3b9
+     move-object v5, v4
+ 
+     .line 943
+-    :goto_3b4
++    :goto_3ba
+     move-object/from16 v0, p1
+ 
+     .line 944
+diff --git a/classes7/mm/DV.smali b/classes7/mm/DV.smali
+index c72def07bbc0784770e6e64d0b0e5428329e6210..a97ad433a7a2dd3a8495b2f0c27c7c379f048f04 100644
+--- a/classes7/mm/DV.smali
++++ b/classes7/mm/DV.smali
+@@ -469,10 +469,10 @@
+ .method public static in(Lmm/i;)V
+     .locals 3
+ 
+-    .line 26
++    .line 27
+     iget-object v0, p0, Lmm/i;->h0:Landroid/media/MediaFormat;
+ 
+-    .line 27
++    .line 28
+     if-eqz v0, :cond_28
+ 
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+@@ -483,7 +483,7 @@
+ 
+     goto :goto_28
+ 
+-    .line 28
++    .line 29
+     :cond_b
+     const-string p0, "profile"
+ 
+@@ -491,34 +491,34 @@
+ 
+     invoke-virtual {v0, p0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 29
++    .line 30
+     const-string p0, "level"
+ 
+     invoke-virtual {v0, p0}, Landroid/media/MediaFormat;->removeKey(Ljava/lang/String;)V
+ 
+-    .line 30
++    .line 31
+     const-string p0, "color-standard"
+ 
+     const/4 v2, 0x6
+ 
+     invoke-virtual {v0, p0, v2}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 31
++    .line 32
+     const-string p0, "color-transfer"
+ 
+     const/4 v2, 0x7
+ 
+     invoke-virtual {v0, p0, v2}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 32
++    .line 33
+     const-string p0, "color-range"
+ 
+     invoke-virtual {v0, p0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 33
++    .line 34
+     return-void
+ 
+-    .line 27
++    .line 28
+     :cond_28
+     :goto_28
+     return-void
+@@ -527,7 +527,7 @@
+ .method public static out(Lmm/i;Landroid/media/MediaFormat;)V
+     .locals 3
+ 
+-    .line 36
++    .line 37
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+@@ -550,30 +550,30 @@
+ 
+     goto :goto_29
+ 
+-    .line 37
++    .line 38
+     :cond_15
+     const-string v0, "video/dolby-vision"
+ 
+     invoke-virtual {p1, v1, v0}, Landroid/media/MediaFormat;->setString(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    .line 38
++    .line 39
+     const-string v0, "profile"
+ 
+     const/16 v1, 0x100
+ 
+     invoke-virtual {p1, v0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 39
++    .line 40
+     const-string v0, "level"
+ 
+     iget p0, p0, Lmm/i;->g1:I
+ 
+     invoke-virtual {p1, v0, p0}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 40
++    .line 41
+     return-void
+ 
+-    .line 36
++    .line 37
+     :cond_29
+     :goto_29
+     return-void
+@@ -582,7 +582,7 @@
+ .method public static sample(Lmm/i;ILjava/nio/ByteBuffer;Landroid/media/MediaCodec$BufferInfo;)Ljava/nio/ByteBuffer;
+     .locals 6
+ 
+-    .line 43
++    .line 44
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+@@ -605,7 +605,7 @@
+ 
+     goto :goto_4c
+ 
+-    .line 44
++    .line 45
+     :cond_15
+     iget p0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+ 
+@@ -619,12 +619,12 @@
+ 
+     move-result-object p0
+ 
+-    .line 45
++    .line 46
+     invoke-virtual {p2}, Ljava/nio/ByteBuffer;->duplicate()Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+ 
+-    .line 46
++    .line 47
+     iget p2, p3, Landroid/media/MediaCodec$BufferInfo;->offset:I
+ 
+     iget v0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+@@ -639,7 +639,7 @@
+ 
+     invoke-virtual {p2, v0}, Ljava/nio/ByteBuffer;->position(I)Ljava/nio/ByteBuffer;
+ 
+-    .line 47
++    .line 48
+     invoke-virtual {p0, p1}, Ljava/nio/ByteBuffer;->put(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+@@ -652,7 +652,7 @@
+ 
+     invoke-virtual {p1}, Ljava/nio/ByteBuffer;->flip()Ljava/nio/ByteBuffer;
+ 
+-    .line 48
++    .line 49
+     invoke-virtual {p0}, Ljava/nio/ByteBuffer;->limit()I
+ 
+     move-result v2
+@@ -667,10 +667,10 @@
+ 
+     invoke-virtual/range {v0 .. v5}, Landroid/media/MediaCodec$BufferInfo;->set(IIJI)V
+ 
+-    .line 49
++    .line 50
+     return-object p0
+ 
+-    .line 43
++    .line 44
+     :cond_4c
+     :goto_4c
+     return-object p2
+@@ -679,14 +679,20 @@
+ .method public static want(Lom/t0;)Z
+     .locals 5
+ 
+-    .line 19
++    .line 20
+     invoke-virtual {p0}, Lom/t0;->Se()Z
+ 
+     move-result v0
+ 
+     const/4 v1, 0x0
+ 
+-    if-eqz v0, :cond_38
++    if-eqz v0, :cond_3e
++
++    invoke-static {}, Lom/t0;->tenBitPref()Z
++
++    move-result v0
++
++    if-eqz v0, :cond_3e
+ 
+     const-string v0, "com.oplus.feature.video.dv.support"
+ 
+@@ -694,46 +700,46 @@
+ 
+     move-result v0
+ 
+-    if-nez v0, :cond_10
++    if-nez v0, :cond_16
+ 
+-    goto :goto_38
++    goto :goto_3e
+ 
+-    .line 20
+-    :cond_10
++    .line 21
++    :cond_16
+     invoke-virtual {p0}, Lom/t0;->h7()Ljava/lang/String;
+ 
+     move-result-object v0
+ 
+-    .line 21
++    .line 22
+     const-string v2, "video_size_1080p"
+ 
+     invoke-virtual {v2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+     move-result v2
+ 
+-    .line 22
++    .line 23
+     invoke-virtual {p0}, Lom/t0;->Qa()I
+ 
+     move-result v3
+ 
+     const/16 v4, 0x1e
+ 
+-    if-ne v3, v4, :cond_24
++    if-ne v3, v4, :cond_2a
+ 
+     move v1, v2
+ 
+-    goto :goto_37
++    goto :goto_3d
+ 
+-    :cond_24
++    :cond_2a
+     invoke-virtual {p0}, Lom/t0;->Qa()I
+ 
+     move-result p0
+ 
+     const/16 v3, 0x3c
+ 
+-    if-ne p0, v3, :cond_37
++    if-ne p0, v3, :cond_3d
+ 
+-    if-nez v2, :cond_36
++    if-nez v2, :cond_3c
+ 
+     const-string p0, "video_size_4kuhd"
+ 
+@@ -741,17 +747,17 @@
+ 
+     move-result p0
+ 
+-    if-eqz p0, :cond_37
++    if-eqz p0, :cond_3d
+ 
+-    :cond_36
++    :cond_3c
+     const/4 v1, 0x1
+ 
+-    :cond_37
+-    :goto_37
++    :cond_3d
++    :goto_3d
+     return v1
+ 
+-    .line 19
+-    :cond_38
+-    :goto_38
++    .line 20
++    :cond_3e
++    :goto_3e
+     return v1
+ .end method
