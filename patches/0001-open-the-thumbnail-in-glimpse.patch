@@ -1,0 +1,143 @@
+open the thumbnail in Glimpse
+
+Smali changes of vendor_oplus_camera c3db1b0, over baksmali --sequential-labels output.
+
+diff --git a/classes/com/oplus/camera/CameraManager$e.smali b/classes/com/oplus/camera/CameraManager$e.smali
+index 1e5553c1fc75c161fc4e3047d7a6892b440e72ff..ffe4d5071d6f70e42aed5feceb422428822d1724 100644
+--- a/classes/com/oplus/camera/CameraManager$e.smali
++++ b/classes/com/oplus/camera/CameraManager$e.smali
+@@ -12184,7 +12184,7 @@
+ 
+     .line 285
+     :cond_11d
+-    const-string v3, "com.android.camera.action.REVIEW"
++    const-string v3, "android.provider.action.REVIEW"
+ 
+     .line 287
+     :goto_11f
+diff --git a/classes7/com/oplus/camera/helper/GalleryHelper.smali b/classes7/com/oplus/camera/helper/GalleryHelper.smali
+index 94fc2ec26c8a14891e76043dd560335ac38f2a82..78050c7788fef56080873e4e0b6c123e89d5b659 100644
+--- a/classes7/com/oplus/camera/helper/GalleryHelper.smali
++++ b/classes7/com/oplus/camera/helper/GalleryHelper.smali
+@@ -7569,7 +7569,7 @@
+ 
+     .line 34
+     .line 35
+-    const-string v4, "com.coloros.gallery3d"
++    const-string v4, "org.lineageos.glimpse"
+ 
+     .line 36
+     .line 37
+@@ -9421,7 +9421,7 @@
+ 
+     .line 42
+     .line 43
+-    const-string v3, "com.coloros.gallery3d"
++    const-string v3, "org.lineageos.glimpse"
+ 
+     .line 44
+     .line 45
+@@ -9951,7 +9951,7 @@
+ 
+     .line 292
+     :cond_123
+-    const-string v5, "com.android.camera.action.REVIEW"
++    const-string v5, "android.provider.action.REVIEW"
+ 
+     .line 293
+     .line 294
+diff --git a/classes7/com/oplus/camera/util/Util.smali b/classes7/com/oplus/camera/util/Util.smali
+index ad745f736d04c7ea465d5b691d5342ba288c89ed..fc809c726dc7f4f7372a7862ec22819998213572 100644
+--- a/classes7/com/oplus/camera/util/Util.smali
++++ b/classes7/com/oplus/camera/util/Util.smali
+@@ -1401,7 +1401,7 @@
+     .locals 3
+ 
+     .line 1
+-    const-string v0, "com.coloros.gallery3d"
++    const-string v0, "org.lineageos.glimpse"
+ 
+     .line 2
+     .line 3
+diff --git a/classes7/com/oplus/camera/util/s1.smali b/classes7/com/oplus/camera/util/s1.smali
+index 06b6f5edb345d29ab123f54bb2a9124cf720e461..6a5323bd1af4ff5b6446fce676ec45fe1f66a32b 100644
+--- a/classes7/com/oplus/camera/util/s1.smali
++++ b/classes7/com/oplus/camera/util/s1.smali
+@@ -245,76 +245,7 @@
+ .method public final a()Ljava/lang/String;
+     .locals 0
+ 
+-    .line 1
+-    iget-boolean p0, p0, Lcom/oplus/camera/util/s1;->a:Z
+-
+-    .line 2
+-    .line 3
+-    if-eqz p0, :cond_7
+-
+-    .line 4
+-    .line 5
+-    const-string p0, "com.oplus.gallery.base"
+-
+-    .line 6
+-    .line 7
+-    return-object p0
+-
+-    .line 8
+-    :cond_7
+-    invoke-static {}, Lcom/oplus/camera/util/Util;->H()V
+-
+-    .line 9
+-    .line 10
+-    .line 11
+-    const-string p0, "com.coloros.gallery3d"
++    const-string p0, "org.lineageos.glimpse"
+ 
+-    .line 12
+-    .line 13
+     return-object p0
+-    .line 14
+-    .line 15
+-    .line 16
+-    .line 17
+-    .line 18
+-    .line 19
+-    .line 20
+-    .line 21
+-    .line 22
+-    .line 23
+-    .line 24
+-    .line 25
+-    .line 26
+-    .line 27
+-    .line 28
+-    .line 29
+-    .line 30
+-    .line 31
+-    .line 32
+-    .line 33
+-    .line 34
+-    .line 35
+-    .line 36
+-    .line 37
+-    .line 38
+-    .line 39
+-    .line 40
+-    .line 41
+-    .line 42
+-    .line 43
+-    .line 44
+-    .line 45
+-    .line 46
+-    .line 47
+-    .line 48
+-    .line 49
+-    .line 50
+-    .line 51
+-    .line 52
+-    .line 53
+-    .line 54
+-    .line 55
+-    .line 56
+-    .line 57
+-    .line 58
+ .end method
