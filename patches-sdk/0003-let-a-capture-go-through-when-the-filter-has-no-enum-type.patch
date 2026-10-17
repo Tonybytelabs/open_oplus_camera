@@ -1,0 +1,197 @@
+let a capture go through when the filter has no enum type
+
+Smali changes of vendor_oplus_camera c06e4bf, over baksmali --sequential-labels output.
+
+diff --git a/classes/com/oplus/ocs/camera/producer/mode/BaseMode.smali b/classes/com/oplus/ocs/camera/producer/mode/BaseMode.smali
+index 5f3379e499857ea5fdf0bb2043ef61d8becbb6b9..e988d63715ccd69428471f9df0947aefd3554d49 100644
+--- a/classes/com/oplus/ocs/camera/producer/mode/BaseMode.smali
++++ b/classes/com/oplus/ocs/camera/producer/mode/BaseMode.smali
+@@ -27879,7 +27879,7 @@
+ 
+     const/4 v4, 0x0
+ 
+-    sparse-switch v0, :sswitch_data_8ee
++    sparse-switch v0, :sswitch_data_8f0
+ 
+     :goto_b8
+     move v0, v1
+@@ -27933,9 +27933,9 @@
+     move v0, v4
+ 
+     :goto_da
+-    packed-switch v0, :pswitch_data_8fc
++    packed-switch v0, :pswitch_data_8fe
+ 
+-    goto/16 :goto_8ed
++    goto/16 :goto_8ef
+ 
+     .line 943
+     :pswitch_df
+@@ -28892,7 +28892,7 @@
+     :cond_424
+     invoke-direct {p0, p1, p4}, Lcom/oplus/ocs/camera/producer/mode/BaseMode;->prepareRemoteDump(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;Lcom/oplus/ocs/camera/common/util/CameraRequestTag;)V
+ 
+-    goto/16 :goto_8ed
++    goto/16 :goto_8ef
+ 
+     :catchall_429
+     move-exception p0
+@@ -30089,7 +30089,7 @@
+ 
+     invoke-virtual/range {v5 .. v10}, Lcom/oplus/ocs/camera/platform/PlatformDifferentiation;->baseModeUpdateStageParameterBuilder(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;Lcom/oplus/ocs/camera/metadata/parameter/Parameter;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;)V
+ 
+-    goto/16 :goto_8ed
++    goto/16 :goto_8ef
+ 
+     .line 1106
+     :pswitch_832
+@@ -30102,7 +30102,7 @@
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_84b
++    if-eqz p2, :cond_84d
+ 
+     .line 1109
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/URequestKeys;->KEY_FILTER_ENUM_TYPE:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+@@ -30113,6 +30113,8 @@
+ 
+     check-cast p2, Ljava/lang/Integer;
+ 
++    if-eqz p2, :cond_84d
++
+     invoke-virtual {p2}, Ljava/lang/Integer;->intValue()I
+ 
+     move-result p2
+@@ -30120,14 +30122,14 @@
+     iput p2, p4, Lcom/oplus/ocs/camera/common/util/CameraRequestTag;->mFilterEnumType:I
+ 
+     .line 1112
+-    :cond_84b
++    :cond_84d
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UTakePictureKeys;->KEY_CAPTURE_TIME:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+ 
+     invoke-virtual {p1, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_860
++    if-eqz p2, :cond_862
+ 
+     .line 1113
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UTakePictureKeys;->KEY_EXIF_TAG_DATETIME:Lcom/oplus/ocs/camera/metadata/RequestKey;
+@@ -30143,14 +30145,14 @@
+     invoke-virtual {p1, p2, p3}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 1116
+-    :cond_860
++    :cond_862
+     sget-object p2, Lcom/oplus/ocs/camera/common/util/CameraConstant;->KEY_AI_PRESET_ASD_ENABLE:Landroid/hardware/camera2/CaptureRequest$Key;
+ 
+     invoke-virtual {p1, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->containsKey(Landroid/hardware/camera2/CaptureRequest$Key;)Z
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_876
++    if-eqz p2, :cond_878
+ 
+     .line 1117
+     sget-object p2, Lcom/oplus/ocs/camera/common/util/CameraConstant;->KEY_AI_PRESET_ASD_ENABLE:Landroid/hardware/camera2/CaptureRequest$Key;
+@@ -30168,14 +30170,14 @@
+     iput p2, p4, Lcom/oplus/ocs/camera/common/util/CameraRequestTag;->mAsdPresetEnable:I
+ 
+     .line 1120
+-    :cond_876
++    :cond_878
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UPreviewKeys;->KEY_FAST_SHOT_ENABLE:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+ 
+     invoke-virtual {p1, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_890
++    if-eqz p2, :cond_892
+ 
+     .line 1121
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UPreviewKeys;->KEY_FAST_SHOT_ENABLE:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+@@ -30198,14 +30200,14 @@
+     iput-boolean p2, p0, Lcom/oplus/ocs/camera/producer/mode/BaseMode;->mbIsFastShotEnable:Z
+ 
+     .line 1125
+-    :cond_890
++    :cond_892
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UPreviewKeys;->KEY_FAST_SHOT_VERSION:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+ 
+     invoke-virtual {p1, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_8a6
++    if-eqz p2, :cond_8a8
+ 
+     .line 1126
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UPreviewKeys;->KEY_FAST_SHOT_VERSION:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+@@ -30223,14 +30225,14 @@
+     iput p2, p4, Lcom/oplus/ocs/camera/common/util/CameraRequestTag;->mFastShotVersion:I
+ 
+     .line 1129
+-    :cond_8a6
++    :cond_8a8
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UTakePictureKeys;->KEY_INTERVAL_SHOOTING_TIME:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+ 
+     invoke-virtual {p1, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_8bc
++    if-eqz p2, :cond_8be
+ 
+     .line 1130
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UTakePictureKeys;->KEY_INTERVAL_SHOOTING_TIME:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+@@ -30248,14 +30250,14 @@
+     iput-wide p2, p4, Lcom/oplus/ocs/camera/common/util/CameraRequestTag;->mIntervalShootingTime:J
+ 
+     .line 1133
+-    :cond_8bc
++    :cond_8be
+     sget-object p2, Lcom/oplus/ocs/camera/metadata/UPreviewKeys;->KEY_FILTER_TYPE:Lcom/oplus/ocs/camera/metadata/PreviewKey;
+ 
+     invoke-virtual {p1, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result p2
+ 
+-    if-eqz p2, :cond_8d1
++    if-eqz p2, :cond_8d3
+ 
+     .line 1134
+     sget-object p2, Lcom/oplus/ocs/camera/producer/device/CameraMetadataKey;->KEY_FILTER_TYPE:Landroid/hardware/camera2/CaptureRequest$Key;
+@@ -30271,7 +30273,7 @@
+     invoke-virtual {p1, p2, p3}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Landroid/hardware/camera2/CaptureRequest$Key;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 1137
+-    :cond_8d1
++    :cond_8d3
+     invoke-direct {p0, p1, p4}, Lcom/oplus/ocs/camera/producer/mode/BaseMode;->prepareRemoteDump(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;Lcom/oplus/ocs/camera/common/util/CameraRequestTag;)V
+ 
+     .line 1138
+@@ -30299,17 +30301,17 @@
+ 
+     invoke-virtual {p1, p0, p2}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+-    :goto_8ed
++    :goto_8ef
+     return-void
+ 
+-    :sswitch_data_8ee
++    :sswitch_data_8f0
+     .sparse-switch
+         -0x377cadfa -> :sswitch_d0
+         -0x2ff29d1a -> :sswitch_c5
+         0x7d51cceb -> :sswitch_ba
+     .end sparse-switch
+ 
+-    :pswitch_data_8fc
++    :pswitch_data_8fe
+     .packed-switch 0x0
+         :pswitch_832
+         :pswitch_42c
