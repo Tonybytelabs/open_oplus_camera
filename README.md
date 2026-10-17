@@ -23,7 +23,7 @@ patches and writes the result to `vendor/oplus/camera-blobs`, the private
 | Files | Firmware |
 |---|---|
 | `my_product/...` (camera app, unit jars, JNI libraries) | OPPO Find X10 Pro Max, PMX110_17.0.0.105(CN01) |
-| `my_stock/...` (gallery, Private Safe) | OnePlus 15, CPH2747_16.0.10.601(EX01) |
+| `my_stock/...` (gallery, Private Safe, scanner, Translate) | OnePlus 15, CPH2747_16.0.10.601(EX01) |
 | everything else | OxygenOS 16 port for the OnePlus 9, LE2113_16.0.10.500(EX01) |
 
 ## Use

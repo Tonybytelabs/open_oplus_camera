@@ -64,4 +64,10 @@
         <permission name="android.permission.MANAGE_USERS"/>
         <permission name="android.permission.INSTALL_PACKAGES"/>
     </privapp-permissions>
+
+    <!-- OPLUS scanner (Breeno Scan) -->
+    <privapp-permissions package="com.coloros.ocrscanner">
+        <permission name="android.permission.CHANGE_CONFIGURATION"/>
+        <permission name="android.permission.SYSTEM_CAMERA"/>
+    </privapp-permissions>
 </permissions>

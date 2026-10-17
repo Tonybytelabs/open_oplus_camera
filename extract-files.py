@@ -23,6 +23,7 @@ from extract_utils.main import (
 )
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'tools'))
+import manifest_add_permission  # noqa: E402
 import smali_patch  # noqa: E402
 
 
@@ -50,11 +51,20 @@ def smali_patches(patch_dir: str) -> blob_fixup:
     return blob_fixup().call(impl, need_tmp_dir=False)
 
 
+def add_permissions(*permissions: str) -> blob_fixup:
+    def impl(ctx, file, file_path, *args, **kwargs):
+        manifest_add_permission.apply(file_path, file_path, list(permissions))
+
+    return blob_fixup().call(impl, need_tmp_dir=False)
+
+
 blob_fixups: blob_fixups_user_type = {
     'system_ext/priv-app/OplusCamera/OplusCamera.apk': smali_patches('patches'),
     'system_ext/framework/com.oplus.camera.unit.sdk.jar': smali_patches('patches-sdk'),
     'system_ext/priv-app/OppoGallery2/OppoGallery2.apk': smali_patches('patches-gallery'),
     'system_ext/app/FileEncryption/FileEncryption.apk': smali_patches('patches-safe'),
+    # The scanner opens the system-only logical camera; CameraService wants SYSTEM_CAMERA for it.
+    'system_ext/priv-app/OcrScanner/OcrScanner.apk': add_permissions('android.permission.SYSTEM_CAMERA'),
 }  # fmt: skip
 
 # The blobs go to vendor/oplus/camera-blobs (the open_oplus_camera_blobs repo); this repo only
