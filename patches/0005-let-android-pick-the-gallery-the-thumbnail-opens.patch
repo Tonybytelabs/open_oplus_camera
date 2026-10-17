@@ -1,0 +1,671 @@
+let Android pick the gallery the thumbnail opens
+
+Smali changes of vendor_oplus_camera 125a61f, over baksmali --sequential-labels output.
+
+diff --git a/classes/com/oplus/camera/CameraManager$e.smali b/classes/com/oplus/camera/CameraManager$e.smali
+index ffe4d5071d6f70e42aed5feceb422428822d1724..14a82f734dd4f153b1136b884cf80bcf034e2671 100644
+--- a/classes/com/oplus/camera/CameraManager$e.smali
++++ b/classes/com/oplus/camera/CameraManager$e.smali
+@@ -12184,7 +12184,7 @@
+ 
+     .line 285
+     :cond_11d
+-    const-string v3, "android.provider.action.REVIEW"
++    const-string v3, "android.intent.action.VIEW"
+ 
+     .line 287
+     :goto_11f
+diff --git a/classes7/com/oplus/camera/helper/GalleryHelper.smali b/classes7/com/oplus/camera/helper/GalleryHelper.smali
+index 78050c7788fef56080873e4e0b6c123e89d5b659..d6284e414b938b46c0fd8b021db4bd99b51c92e6 100644
+--- a/classes7/com/oplus/camera/helper/GalleryHelper.smali
++++ b/classes7/com/oplus/camera/helper/GalleryHelper.smali
+@@ -7569,7 +7569,7 @@
+ 
+     .line 34
+     .line 35
+-    const-string v4, "org.lineageos.glimpse"
++    const-string v4, "com.coloros.gallery3d"
+ 
+     .line 36
+     .line 37
+@@ -9421,7 +9421,7 @@
+ 
+     .line 42
+     .line 43
+-    const-string v3, "org.lineageos.glimpse"
++    const-string v3, "com.coloros.gallery3d"
+ 
+     .line 44
+     .line 45
+@@ -9951,7 +9951,7 @@
+ 
+     .line 292
+     :cond_123
+-    const-string v5, "android.provider.action.REVIEW"
++    const-string v5, "android.intent.action.VIEW"
+ 
+     .line 293
+     .line 294
+diff --git a/classes7/com/oplus/camera/util/Util.smali b/classes7/com/oplus/camera/util/Util.smali
+index fc809c726dc7f4f7372a7862ec22819998213572..f469c53895ccb2718377034dfa5cb52d24d76e75 100644
+--- a/classes7/com/oplus/camera/util/Util.smali
++++ b/classes7/com/oplus/camera/util/Util.smali
+@@ -1398,107 +1398,11 @@
+ .end method
+ 
+ .method public static C0(Landroid/app/Activity;)Z
+-    .locals 3
+-
+-    .line 1
+-    const-string v0, "org.lineageos.glimpse"
+-
+-    .line 2
+-    .line 3
+-    const/4 v1, 0x0
+-
+-    .line 4
+-    :try_start_3
+-    invoke-virtual {p0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+-
+-    .line 5
+-    .line 6
+-    .line 7
+-    move-result-object p0
+-
+-    .line 8
+-    invoke-virtual {p0, v0, v1}, Landroid/content/pm/PackageManager;->getApplicationInfo(Ljava/lang/String;I)Landroid/content/pm/ApplicationInfo;
+-
+-    .line 9
+-    .line 10
+-    .line 11
+-    move-result-object p0
+-    :try_end_b
+-    .catch Ljava/lang/Exception; {:try_start_3 .. :try_end_b} :catch_c
+-
+-    .line 12
+-    goto :goto_15
+-
+-    .line 13
+-    :catch_c
+-    move-exception p0
+-
+-    .line 14
+-    const-string v0, "isPackageExist, packageName: com.coloros.gallery3d, e: "
+-
+-    .line 15
+-    .line 16
+-    const-string v2, "Util"
+-
+-    .line 17
+-    .line 18
+-    invoke-static {v2, v0, p0}, Lza/a;->k(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Throwable;)V
+-
+-    .line 19
+-    .line 20
+-    .line 21
+-    const/4 p0, 0x0
+-
+-    .line 22
+-    :goto_15
+-    if-eqz p0, :cond_18
++    .locals 0
+ 
+-    .line 23
+-    .line 24
+-    const/4 v1, 0x1
++    const/4 p0, 0x1
+ 
+-    .line 25
+-    :cond_18
+-    return v1
+-    .line 26
+-    .line 27
+-    .line 28
+-    .line 29
+-    .line 30
+-    .line 31
+-    .line 32
+-    .line 33
+-    .line 34
+-    .line 35
+-    .line 36
+-    .line 37
+-    .line 38
+-    .line 39
+-    .line 40
+-    .line 41
+-    .line 42
+-    .line 43
+-    .line 44
+-    .line 45
+-    .line 46
+-    .line 47
+-    .line 48
+-    .line 49
+-    .line 50
+-    .line 51
+-    .line 52
+-    .line 53
+-    .line 54
+-    .line 55
+-    .line 56
+-    .line 57
+-    .line 58
+-    .line 59
+-    .line 60
+-    .line 61
+-    .line 62
+-    .line 63
+-    .line 64
++    return p0
+ .end method
+ 
+ .method public static D(Landroid/content/Context;)Ljava/io/File;
+@@ -11447,12 +11351,7 @@
+     move-result-object v2
+ 
+     .line 15
+-    invoke-virtual {v2}, Lcom/oplus/camera/util/s1;->a()Ljava/lang/String;
+-
+-    .line 16
+-    .line 17
+-    .line 18
+-    move-result-object v2
++    const-string v2, "com.coloros.gallery3d"
+ 
+     .line 19
+     invoke-virtual/range {p0 .. p0}, Landroid/content/Context;->getPackageManager()Landroid/content/pm/PackageManager;
+@@ -11477,21 +11376,21 @@
+     const/4 v11, 0x0
+ 
+     .line 29
+-    if-nez v2, :cond_20
++    if-nez v2, :cond_1e
+ 
+     .line 30
+     .line 31
+     move v2, v11
+ 
+     .line 32
+-    goto :goto_21
++    goto :goto_1f
+ 
+     .line 33
+-    :cond_20
++    :cond_1e
+     move v2, v10
+ 
+     .line 34
+-    :goto_21
++    :goto_1f
+     invoke-static/range {p0 .. p0}, Lzk/d;->f(Landroid/content/Context;)I
+ 
+     .line 35
+@@ -11503,51 +11402,51 @@
+     const/4 v12, 0x3
+ 
+     .line 39
+-    if-eq v10, v3, :cond_2d
++    if-eq v10, v3, :cond_2b
+ 
+     .line 40
+     .line 41
+-    if-ne v12, v3, :cond_2b
++    if-ne v12, v3, :cond_29
+ 
+     .line 42
+     .line 43
+-    goto :goto_2d
++    goto :goto_2b
+ 
+     .line 44
+-    :cond_2b
++    :cond_29
+     move v3, v11
+ 
+     .line 45
+-    goto :goto_2e
++    goto :goto_2c
+ 
+     .line 46
+-    :cond_2d
+-    :goto_2d
++    :cond_2b
++    :goto_2b
+     move v3, v10
+ 
+     .line 47
+-    :goto_2e
++    :goto_2c
+     const-string v13, "Util"
+ 
+     .line 48
+     .line 49
+-    if-eqz v1, :cond_28a
++    if-eqz v1, :cond_286
+ 
+     .line 50
+     .line 51
+-    if-eqz v2, :cond_28a
++    if-eqz v2, :cond_286
+ 
+     .line 52
+     .line 53
+-    if-nez v3, :cond_38
++    if-nez v3, :cond_36
+ 
+     .line 54
+     .line 55
+-    goto/16 :goto_28a
++    goto/16 :goto_286
+ 
+     .line 56
+     .line 57
+-    :cond_38
++    :cond_36
+     invoke-static {}, Lcom/oplus/camera/util/Util;->H()V
+ 
+     .line 58
+@@ -11565,7 +11464,7 @@
+     move-result v2
+ 
+     .line 66
+-    if-eqz v2, :cond_4a
++    if-eqz v2, :cond_48
+ 
+     .line 67
+     .line 68
+@@ -11582,7 +11481,7 @@
+     return v11
+ 
+     .line 75
+-    :cond_4a
++    :cond_48
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 76
+@@ -11631,7 +11530,7 @@
+     move-result v1
+ 
+     .line 99
+-    if-nez v1, :cond_6c
++    if-nez v1, :cond_6a
+ 
+     .line 100
+     .line 101
+@@ -11647,12 +11546,12 @@
+     move-result v1
+ 
+     .line 107
+-    if-eqz v1, :cond_76
++    if-eqz v1, :cond_74
+ 
+     .line 108
+     .line 109
+-    :cond_6c
+-    if-nez p2, :cond_76
++    :cond_6a
++    if-nez p2, :cond_74
+ 
+     .line 110
+     .line 111
+@@ -11664,21 +11563,21 @@
+     move-result v1
+ 
+     .line 115
+-    if-eqz v1, :cond_76
++    if-eqz v1, :cond_74
+ 
+     .line 116
+     .line 117
+     move v1, v10
+ 
+     .line 118
+-    goto :goto_77
++    goto :goto_75
+ 
+     .line 119
+-    :cond_76
++    :cond_74
+     move v1, v11
+ 
+     .line 120
+-    :goto_77
++    :goto_75
+     const-string v2, "highPixel"
+ 
+     .line 121
+@@ -11691,29 +11590,29 @@
+     move-result v2
+ 
+     .line 126
+-    if-eqz v2, :cond_85
++    if-eqz v2, :cond_83
+ 
+     .line 127
+     .line 128
+-    if-eqz v7, :cond_85
++    if-eqz v7, :cond_83
+ 
+     .line 129
+     .line 130
+-    if-eqz v1, :cond_85
++    if-eqz v1, :cond_83
+ 
+     .line 131
+     .line 132
+     move v8, v10
+ 
+     .line 133
+-    goto :goto_86
++    goto :goto_84
+ 
+     .line 134
+-    :cond_85
++    :cond_83
+     move v8, v11
+ 
+     .line 135
+-    :goto_86
++    :goto_84
+     new-instance v5, Landroid/content/Intent;
+ 
+     .line 136
+@@ -11735,12 +11634,7 @@
+     move-result-object v2
+ 
+     .line 146
+-    invoke-virtual {v2}, Lcom/oplus/camera/util/s1;->a()Ljava/lang/String;
+-
+-    .line 147
+-    .line 148
+-    .line 149
+-    move-result-object v2
++    const-string v2, "com.coloros.gallery3d"
+ 
+     .line 150
+     const-string v3, "com.oplus.gallery.pictureeditorpage.PhotoEditorActivity"
+@@ -11886,7 +11780,7 @@
+     move-result v1
+ 
+     .line 227
+-    if-eqz v1, :cond_ee
++    if-eqz v1, :cond_ea
+ 
+     .line 228
+     .line 229
+@@ -11902,21 +11796,21 @@
+     move-result v1
+ 
+     .line 235
+-    if-eqz v1, :cond_ee
++    if-eqz v1, :cond_ea
+ 
+     .line 236
+     .line 237
+     move v1, v10
+ 
+     .line 238
+-    goto :goto_ef
++    goto :goto_eb
+ 
+     .line 239
+-    :cond_ee
++    :cond_ea
+     move v1, v11
+ 
+     .line 240
+-    :goto_ef
++    :goto_eb
+     const-string v2, "is_new_master_ai_mode"
+ 
+     .line 241
+@@ -11958,7 +11852,7 @@
+ 
+     .line 260
+     .line 261
+-    if-eqz v1, :cond_114
++    if-eqz v1, :cond_110
+ 
+     .line 262
+     .line 263
+@@ -11989,14 +11883,14 @@
+     move-object v2, v1
+ 
+     .line 276
+-    goto :goto_115
++    goto :goto_111
+ 
+     .line 277
+-    :cond_114
++    :cond_110
+     move-object v2, v3
+ 
+     .line 278
+-    :goto_115
++    :goto_111
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 279
+@@ -12025,7 +11919,7 @@
+     move-result v1
+ 
+     .line 292
+-    if-eqz v1, :cond_133
++    if-eqz v1, :cond_12f
+ 
+     .line 293
+     .line 294
+@@ -12056,14 +11950,14 @@
+     move-object v10, v1
+ 
+     .line 307
+-    goto :goto_134
++    goto :goto_130
+ 
+     .line 308
+-    :cond_133
++    :cond_12f
+     move-object v10, v3
+ 
+     .line 309
+-    :goto_134
++    :goto_130
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 310
+@@ -12092,7 +11986,7 @@
+     move-result v1
+ 
+     .line 323
+-    if-eqz v1, :cond_152
++    if-eqz v1, :cond_14e
+ 
+     .line 324
+     .line 325
+@@ -12123,14 +12017,14 @@
+     move-object v12, v1
+ 
+     .line 338
+-    goto :goto_153
++    goto :goto_14f
+ 
+     .line 339
+-    :cond_152
++    :cond_14e
+     move-object v12, v3
+ 
+     .line 340
+-    :goto_153
++    :goto_14f
+     const-string v1, "camera_watermark_photo_style_id"
+ 
+     .line 341
+@@ -12170,7 +12064,7 @@
+     move-result v1
+ 
+     .line 361
+-    if-eqz v1, :cond_16d
++    if-eqz v1, :cond_169
+ 
+     .line 362
+     .line 363
+@@ -12179,7 +12073,7 @@
+     .line 364
+     .line 365
+     .line 366
+-    :cond_16d
++    :cond_169
+     invoke-static {v2}, Landroid/text/TextUtils;->isEmpty(Ljava/lang/CharSequence;)Z
+ 
+     .line 367
+@@ -12254,7 +12148,7 @@
+     move-result v1
+ 
+     .line 404
+-    if-nez v1, :cond_272
++    if-nez v1, :cond_26e
+ 
+     .line 405
+     .line 406
+@@ -12286,7 +12180,7 @@
+     move-result v1
+ 
+     .line 420
+-    if-eqz v1, :cond_24a
++    if-eqz v1, :cond_246
+ 
+     .line 421
+     .line 422
+@@ -12327,7 +12221,7 @@
+     move-result v3
+ 
+     .line 441
+-    if-eqz v3, :cond_1c1
++    if-eqz v3, :cond_1bd
+ 
+     .line 442
+     .line 443
+@@ -12344,7 +12238,7 @@
+     .line 448
+     .line 449
+     .line 450
+-    :cond_1c1
++    :cond_1bd
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 451
+@@ -12377,7 +12271,7 @@
+     move-result v3
+ 
+     .line 466
+-    if-nez v3, :cond_1db
++    if-nez v3, :cond_1d7
+ 
+     .line 467
+     .line 468
+@@ -12397,7 +12291,7 @@
+     .line 474
+     .line 475
+     .line 476
+-    :cond_1db
++    :cond_1d7
+     invoke-static/range {p0 .. p0}, Lzk/d;->v(Landroid/content/Context;)Z
+ 
+     .line 477
+@@ -12406,7 +12300,7 @@
+     move-result v3
+ 
+     .line 480
+-    if-eqz v3, :cond_1e9
++    if-eqz v3, :cond_1e5
+ 
+     .line 481
+     .line 482
+@@ -12426,7 +12320,7 @@
+     .line 488
+     .line 489
+     .line 490
+-    :cond_1e9
++    :cond_1e5
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 491
+@@ -12455,7 +12349,7 @@
+     move-result v3
+ 
+     .line 504
+-    if-eqz v3, :cond_201
++    if-eqz v3, :cond_1fd
+ 
+     .line 505
+     .line 506
+@@ -12475,7 +12369,7 @@
+     .line 512
+     .line 513
+     .line 514
+-    :cond_201
++    :cond_1fd
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 515
+@@ -12615,7 +12509,7 @@
+     .line 585
+     .line 586
+     .line 587
+-    :cond_24a
++    :cond_246
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 588
+@@ -12653,7 +12547,7 @@
+     .line 604
+     .line 605
+     .line 606
+-    if-eqz v9, :cond_264
++    if-eqz v9, :cond_260
+ 
+     .line 607
+     .line 608
+@@ -12666,7 +12560,7 @@
+     .line 611
+     .line 612
+     .line 613
+-    :cond_264
++    :cond_260
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     .line 614
+@@ -12693,7 +12587,7 @@
+     .line 625
+     .line 626
+     .line 627
+-    :cond_272
++    :cond_26e
+     invoke-static {}, Ldh/z;->q8()V
+ 
+     .line 628
+@@ -12740,8 +12634,8 @@
+     return v0
+ 
+     .line 651
+-    :cond_28a
+-    :goto_28a
++    :cond_286
++    :goto_286
+     new-instance v0, Lzd/c;
+ 
+     .line 652
+diff --git a/classes7/com/oplus/camera/util/s1.smali b/classes7/com/oplus/camera/util/s1.smali
+index 6a5323bd1af4ff5b6446fce676ec45fe1f66a32b..7e379ba944bc9b7a2da31b9c927fdf1083cec88d 100644
+--- a/classes7/com/oplus/camera/util/s1.smali
++++ b/classes7/com/oplus/camera/util/s1.smali
+@@ -245,7 +245,7 @@
+ .method public final a()Ljava/lang/String;
+     .locals 0
+ 
+-    const-string p0, "org.lineageos.glimpse"
++    const/4 p0, 0x0
+ 
+     return-object p0
+ .end method
