@@ -1,0 +1,691 @@
+let HEIF be switched off while "10-bit color" is on
+
+Smali changes of vendor_oplus_camera 446c103, over baksmali --sequential-labels output.
+
+diff --git a/classes7/com/oplus/camera/setting/h2.smali b/classes7/com/oplus/camera/setting/h2.smali
+index ff9016c0479771e0906ceac9823f76b6b39069d0..d1d9ae77dad49d61abe47f8aa6ec11b4c98f337f 100644
+--- a/classes7/com/oplus/camera/setting/h2.smali
++++ b/classes7/com/oplus/camera/setting/h2.smali
+@@ -44556,7 +44556,7 @@
+ 
+     move-result-object v1
+ 
+-    if-eqz p1, :cond_97c
++    if-eqz p1, :cond_97a
+ 
+     .line 3
+     invoke-virtual {p0}, Landroidx/fragment/app/Fragment;->getContext()Landroid/content/Context;
+@@ -44565,7 +44565,7 @@
+ 
+     if-nez v2, :cond_16
+ 
+-    goto/16 :goto_97c
++    goto/16 :goto_97a
+ 
+     :cond_16
+     const-string v2, "CameraSubSettingFragment"
+@@ -44694,7 +44694,7 @@
+     .line 16
+     invoke-static {v0, p0, v1, v2}, Lcom/oplus/camera/util/a;->d(Landroid/content/Context;ILjava/lang/String;Ljava/lang/String;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_85
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->e2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -44717,13 +44717,13 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_970
++    if-eqz v0, :cond_96e
+ 
+     invoke-virtual {p0}, Landroidx/fragment/app/Fragment;->getActivity()Landroidx/fragment/app/s;
+ 
+     move-result-object v0
+ 
+-    if-eqz v0, :cond_970
++    if-eqz v0, :cond_96e
+ 
+     .line 19
+     invoke-virtual {p0}, Landroidx/fragment/app/Fragment;->getActivity()Landroidx/fragment/app/s;
+@@ -44738,36 +44738,36 @@
+ 
+     invoke-static {p0, v1}, Lcom/oplus/camera/setting/CameraSubSettingActivity;->O(Landroidx/fragment/app/Fragment;Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_af
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->s2:Lcom/coui/appcompat/preference/COUIMultiSelectListPreference;
+ 
+     const v5, 0x7f110746
+ 
+-    if-eq p1, v2, :cond_91e
++    if-eq p1, v2, :cond_91c
+ 
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->r2:Lcom/coui/appcompat/preference/COUIPreference;
+ 
+-    if-eq p1, v2, :cond_91e
++    if-eq p1, v2, :cond_91c
+ 
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->t2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+ 
+-    if-eq p1, v2, :cond_91e
++    if-eq p1, v2, :cond_91c
+ 
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->u2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+ 
+-    if-eq p1, v2, :cond_91e
++    if-eq p1, v2, :cond_91c
+ 
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->w2:Lcom/coui/appcompat/preference/COUIMenuPreference;
+ 
+-    if-eq p1, v2, :cond_91e
++    if-eq p1, v2, :cond_91c
+ 
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->y2:Lcom/coui/appcompat/preference/COUIMenuPreference;
+ 
+     if-ne p1, v2, :cond_cc
+ 
+-    goto/16 :goto_91e
++    goto/16 :goto_91c
+ 
+     :cond_cc
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->v2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+@@ -44888,7 +44888,7 @@
+ 
+     iget-boolean v1, p0, Lcom/oplus/camera/setting/h2;->T3:Z
+ 
+-    if-eqz v1, :cond_970
++    if-eqz v1, :cond_96e
+ 
+     iput-boolean v0, p0, Lcom/oplus/camera/setting/h2;->T3:Z
+ 
+@@ -45049,7 +45049,7 @@
+     .line 49
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     .line 50
+     :cond_1ae
+@@ -45063,7 +45063,7 @@
+ 
+     invoke-virtual {p0, v0, v1, v3}, Lcom/oplus/camera/data/DataManager;->h(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_1bb
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->A1:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45079,7 +45079,7 @@
+ 
+     move-result p0
+ 
+-    if-eqz p0, :cond_970
++    if-eqz p0, :cond_96e
+ 
+     .line 52
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+@@ -45092,7 +45092,7 @@
+ 
+     invoke-virtual {p0, v0, v1, v3}, Lcom/oplus/camera/data/DataManager;->h(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_1d5
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->b2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45188,7 +45188,7 @@
+     .line 71
+     invoke-virtual {p0}, Lcom/oplus/camera/setting/h2;->G()V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     .line 72
+     :cond_22c
+@@ -45202,7 +45202,7 @@
+     .line 74
+     invoke-virtual {p0, v3, v0}, Lcom/oplus/camera/setting/r;->B(ZZ)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_239
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->H2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45220,7 +45220,7 @@
+ 
+     invoke-virtual {p0, v0, v3}, Lcom/oplus/camera/setting/h2;->l0(ZZ)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_249
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->x2:Lcom/coui/appcompat/preference/COUIMenuPreference;
+@@ -45230,7 +45230,7 @@
+     .line 76
+     invoke-virtual {p0, p1, p2}, Lcom/oplus/camera/setting/h2;->k0(Landroidx/preference/Preference;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_252
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->I2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45253,13 +45253,13 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_970
++    if-eqz v0, :cond_96e
+ 
+     invoke-virtual {p0}, Landroidx/fragment/app/Fragment;->getActivity()Landroidx/fragment/app/s;
+ 
+     move-result-object v0
+ 
+-    if-eqz v0, :cond_970
++    if-eqz v0, :cond_96e
+ 
+     .line 79
+     invoke-virtual {p0}, Landroidx/fragment/app/Fragment;->getActivity()Landroidx/fragment/app/s;
+@@ -45274,7 +45274,7 @@
+ 
+     invoke-static {p0, v1}, Lcom/oplus/camera/setting/CameraSubSettingActivity;->O(Landroidx/fragment/app/Fragment;Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_27c
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->K2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+@@ -45322,7 +45322,7 @@
+     .line 86
+     invoke-virtual {p0, v3}, Lcom/oplus/camera/setting/h2;->c0(Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_2a3
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->J2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+@@ -45370,18 +45370,18 @@
+     .line 93
+     invoke-virtual {p0, v3}, Lcom/oplus/camera/setting/h2;->c0(Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_2ca
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->q2:Lcom/coui/appcompat/preference/COUIMenuPreference;
+ 
+-    if-eq p1, v2, :cond_917
++    if-eq p1, v2, :cond_915
+ 
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->p2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+ 
+     if-ne p1, v2, :cond_2d4
+ 
+-    goto/16 :goto_917
++    goto/16 :goto_915
+ 
+     :cond_2d4
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->n3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45416,7 +45416,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_2f1
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->g2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45550,7 +45550,7 @@
+ 
+     invoke-virtual {p0, v0, v2}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_366
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->o3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45585,7 +45585,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_383
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->P2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45620,7 +45620,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_3a0
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->R2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45655,7 +45655,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_3bd
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->Q2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45695,7 +45695,7 @@
+     .line 117
+     invoke-virtual {p0, v0, v1}, Lcom/oplus/camera/setting/y;->o(Ljava/lang/Object;Ljava/lang/String;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_3df
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->S2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45730,7 +45730,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_3fc
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->T2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45765,7 +45765,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_419
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->U2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45800,7 +45800,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_436
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->V2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45835,7 +45835,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_453
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->W2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45870,7 +45870,7 @@
+ 
+     invoke-virtual {v0, v1, p0}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_470
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->X2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45910,7 +45910,7 @@
+     .line 130
+     invoke-virtual {p0, v0, v1}, Lcom/oplus/camera/setting/y;->o(Ljava/lang/Object;Ljava/lang/String;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_492
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->Y2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45950,7 +45950,7 @@
+     .line 133
+     invoke-virtual {p0, v0, v1}, Lcom/oplus/camera/setting/y;->o(Ljava/lang/Object;Ljava/lang/String;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_4b4
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->Z2:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -45995,7 +45995,7 @@
+ 
+     move-result p0
+ 
+-    if-nez p0, :cond_970
++    if-nez p0, :cond_96e
+ 
+     .line 138
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+@@ -46013,7 +46013,7 @@
+ 
+     move-result p0
+ 
+-    if-eqz p0, :cond_970
++    if-eqz p0, :cond_96e
+ 
+     const-string p0, "portrait"
+ 
+@@ -46034,7 +46034,7 @@
+ 
+     move-result p0
+ 
+-    if-nez p0, :cond_970
++    if-nez p0, :cond_96e
+ 
+     .line 141
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+@@ -46058,7 +46058,7 @@
+ 
+     invoke-virtual {p0, v1, v2, v0}, Lcom/oplus/camera/data/DataManager;->h(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_517
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->a3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -46098,7 +46098,7 @@
+     .line 145
+     invoke-virtual {p0, v0, v1}, Lcom/oplus/camera/setting/y;->o(Ljava/lang/Object;Ljava/lang/String;)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_539
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->M2:Lcom/coui/appcompat/preference/COUIMenuPreference;
+@@ -46140,7 +46140,7 @@
+     .line 154
+     invoke-virtual {p0}, Lcom/oplus/camera/data/DataManager$b;->e()Z
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_55c
+     iget-object v2, p0, Lcom/oplus/camera/setting/h2;->l3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -46213,7 +46213,7 @@
+ 
+     move-result p0
+ 
+-    if-nez p0, :cond_970
++    if-nez p0, :cond_96e
+ 
+     return v0
+ 
+@@ -46742,7 +46742,7 @@
+     .line 239
+     invoke-virtual {v5}, Lcom/oplus/camera/data/DataManager$b;->a()V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_770
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->y3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+@@ -47006,12 +47006,12 @@
+     :cond_84f
+     invoke-virtual {v2}, Lcom/oplus/camera/data/DataManager$b;->a()V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+     :cond_854
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->v3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+ 
+-    if-ne p1, v1, :cond_8c9
++    if-ne p1, v1, :cond_8c7
+ 
+     .line 274
+     instance-of p1, p2, Ljava/lang/Boolean;
+@@ -47081,17 +47081,15 @@
+ 
+     const-string v2, "HEIF"
+ 
+-    if-nez v1, :cond_8a9
++    if-eqz p1, :cond_892
+ 
+-    if-eqz p1, :cond_894
++    goto :goto_894
+ 
+-    goto :goto_896
+-
+-    :cond_894
++    :cond_892
+     const-string v2, "JPEG"
+ 
+     .line 283
+-    :goto_896
++    :goto_894
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+ 
+     move-result-object p0
+@@ -47109,10 +47107,9 @@
+ 
+     invoke-virtual {p0, p1, v2}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+-    goto :goto_8bd
++    goto :goto_8bb
+ 
+-    :cond_8a9
+-    if-eqz p1, :cond_8c2
++    if-eqz p1, :cond_8c0
+ 
+     .line 285
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+@@ -47133,27 +47130,27 @@
+     invoke-virtual {p0, p1, v2}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
+ 
+     .line 287
+-    :goto_8bd
++    :goto_8bb
+     invoke-virtual {p2}, Lcom/oplus/camera/data/DataManager$b;->a()V
+ 
+     move v0, v3
+ 
+-    goto :goto_8c8
++    goto :goto_8c6
+ 
+     .line 288
+-    :cond_8c2
++    :cond_8c0
+     invoke-virtual {p2}, Lcom/oplus/camera/data/DataManager$b;->a()V
+ 
+     .line 289
+     invoke-virtual {p0}, Lcom/oplus/camera/setting/h2;->Y()V
+ 
+-    :goto_8c8
++    :goto_8c6
+     return v0
+ 
+-    :cond_8c9
++    :cond_8c7
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->A3:Lcom/coui/appcompat/preference/COUIMenuPreference;
+ 
+-    if-ne p1, v1, :cond_8f0
++    if-ne p1, v1, :cond_8ee
+ 
+     .line 290
+     invoke-static {p2}, Ljava/lang/String;->valueOf(Ljava/lang/Object;)Ljava/lang/String;
+@@ -47171,7 +47168,7 @@
+ 
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->B3:Lcom/oplus/camera/ui/menu/CameraSingleMarkListPreference;
+ 
+-    if-eqz v1, :cond_970
++    if-eqz v1, :cond_96e
+ 
+     const-string v1, "continuous_shot"
+ 
+@@ -47190,17 +47187,17 @@
+     .line 294
+     invoke-virtual {p0, v0}, Landroidx/preference/Preference;->d0(Z)V
+ 
+-    goto/16 :goto_970
++    goto/16 :goto_96e
+ 
+-    :cond_8f0
++    :cond_8ee
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->T1:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+ 
+-    if-ne p1, v1, :cond_970
++    if-ne p1, v1, :cond_96e
+ 
+     .line 295
+     instance-of v1, p2, Ljava/lang/Boolean;
+ 
+-    if-eqz v1, :cond_8ff
++    if-eqz v1, :cond_8fd
+ 
+     .line 296
+     move-object v0, p2
+@@ -47211,23 +47208,23 @@
+ 
+     move-result v0
+ 
+-    :cond_8ff
++    :cond_8fd
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->U1:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+ 
+-    if-eqz v1, :cond_906
++    if-eqz v1, :cond_904
+ 
+     .line 297
+     invoke-virtual {v1, v0}, Landroidx/preference/Preference;->W(Z)V
+ 
+-    :cond_906
++    :cond_904
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->V1:Lcom/oplus/camera/ui/menu/CameraSingleMarkListPreference;
+ 
+-    if-eqz v1, :cond_90d
++    if-eqz v1, :cond_90b
+ 
+     .line 298
+     invoke-virtual {v1, v0}, Landroidx/preference/Preference;->W(Z)V
+ 
+-    :cond_90d
++    :cond_90b
+     iget-object p0, p0, Lcom/oplus/camera/setting/y;->z:Landroid/content/Context;
+ 
+     const-string v1, "com.oplus.camera quick launch"
+@@ -47237,30 +47234,30 @@
+     .line 299
+     invoke-static {p0, v0, v1, v2}, Lcom/oplus/camera/util/a;->d(Landroid/content/Context;ILjava/lang/String;Ljava/lang/String;)V
+ 
+-    goto :goto_970
++    goto :goto_96e
+ 
+     .line 300
+-    :cond_917
+-    :goto_917
++    :cond_915
++    :goto_915
+     invoke-virtual {p0, p1, p2}, Lcom/oplus/camera/setting/h2;->k0(Landroidx/preference/Preference;Ljava/lang/Object;)V
+ 
+     .line 301
+     invoke-virtual {p0, v3}, Lcom/oplus/camera/setting/h2;->c0(Z)V
+ 
+-    goto :goto_970
++    goto :goto_96e
+ 
+-    :cond_91e
+-    :goto_91e
++    :cond_91c
++    :goto_91c
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->t2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+ 
+-    if-eq p1, v1, :cond_926
++    if-eq p1, v1, :cond_924
+ 
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->u2:Lcom/oplus/camera/ui/menu/CameraCheckBoxPreference;
+ 
+-    if-ne p1, v1, :cond_93d
++    if-ne p1, v1, :cond_93b
+ 
+     .line 302
+-    :cond_926
++    :cond_924
+     move-object v1, p2
+ 
+     check-cast v1, Ljava/lang/Boolean;
+@@ -47269,13 +47266,13 @@
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_93d
++    if-nez v1, :cond_93b
+ 
+     invoke-static {}, Lcom/oplus/camera/setting/h2;->L()Z
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_93d
++    if-nez v1, :cond_93b
+ 
+     .line 303
+     sget p0, Lcom/oplus/camera/util/Util;->a:I
+@@ -47286,10 +47283,10 @@
+ 
+     return v0
+ 
+-    :cond_93d
++    :cond_93b
+     iget-object v1, p0, Lcom/oplus/camera/setting/h2;->r2:Lcom/coui/appcompat/preference/COUIPreference;
+ 
+-    if-ne p1, v1, :cond_964
++    if-ne p1, v1, :cond_962
+ 
+     .line 304
+     move-object v1, p2
+@@ -47300,7 +47297,7 @@
+ 
+     move-result v1
+ 
+-    if-eqz v1, :cond_964
++    if-eqz v1, :cond_962
+ 
+     .line 305
+     invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
+@@ -47321,7 +47318,7 @@
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_964
++    if-nez v1, :cond_962
+ 
+     .line 308
+     sget p0, Lcom/oplus/camera/util/Util;->a:I
+@@ -47333,7 +47330,7 @@
+     return v0
+ 
+     .line 309
+-    :cond_964
++    :cond_962
+     invoke-virtual {p0, p1, p2}, Lcom/oplus/camera/setting/h2;->k0(Landroidx/preference/Preference;Ljava/lang/Object;)V
+ 
+     .line 310
+@@ -47346,11 +47343,11 @@
+     invoke-virtual {p0, v0, v1, v3}, Lcom/oplus/camera/setting/h2;->d0(Landroidx/fragment/app/s;ZZ)V
+ 
+     .line 311
+-    :cond_970
+-    :goto_970
++    :cond_96e
++    :goto_96e
+     instance-of p0, p1, Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
+ 
+-    if-eqz p0, :cond_97b
++    if-eqz p0, :cond_979
+ 
+     .line 312
+     move-object p0, p1
+@@ -47361,11 +47358,11 @@
+ 
+     move-result v3
+ 
+-    :cond_97b
++    :cond_979
+     return v3
+ 
+-    :cond_97c
+-    :goto_97c
++    :cond_97a
++    :goto_97a
+     return v0
+ .end method
+ 
