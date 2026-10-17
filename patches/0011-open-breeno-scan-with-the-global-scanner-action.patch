@@ -1,0 +1,20 @@
+open Breeno Scan with the global scanner's action
+
+The camera, from the China firmware, opens Breeno Scan with coloros.intent.action.OBJECT_SCANNER.
+The global OcrScanner (16.4.7) has no activity for that action and the mode failed with
+ActivityNotFoundException; its scan activity, CameraActivity, answers to
+coloros.intent.action.CAMERA_SCANNER, so the camera asks for that.
+
+diff --git a/classes9/aj/a.smali b/classes9/aj/a.smali
+index ead1423..ca6ec81 100644
+--- a/classes9/aj/a.smali
++++ b/classes9/aj/a.smali
+@@ -8599,7 +8599,7 @@
+ 
+     .line 2
+     .line 3
+-    const-string v1, "coloros.intent.action.OBJECT_SCANNER"
++    const-string v1, "coloros.intent.action.CAMERA_SCANNER"
+ 
+     .line 4
+     .line 5
