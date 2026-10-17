@@ -1,0 +1,839 @@
+use the HAL's HLG pipeline when Dolby Vision is on
+
+Smali changes of vendor_oplus_camera 7814000, over baksmali --sequential-labels output.
+
+diff --git a/classes/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali b/classes/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali
+index e144c0f9693342644bb1d2d2a6f71cf0440f3020..3b5393416ddfb803067fb598e5aaadbcf6668095 100644
+--- a/classes/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali
++++ b/classes/com/oplus/ocs/camera/producer/decision/OperationModeDecision.smali
+@@ -10,6 +10,8 @@
+ 
+ .field private static final VEX_VALUE:I = 0x10
+ 
++.field public static volatile sHalHlg:Z
++
+ 
+ # direct methods
+ .method public constructor <init>()V
+@@ -180,6 +182,57 @@
+     return-object p0
+ .end method
+ 
++.method public static halHlg(Lcom/oplus/ocs/camera/metadata/parameter/Parameter;Landroid/util/Size;)Z
++    .locals 2
++
++    sget-object v0, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_DOLBY_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
++
++    invoke-virtual {p0, v0}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->get(Lcom/oplus/ocs/camera/metadata/RequestKey;)Ljava/lang/Object;
++
++    move-result-object v0
++
++    const-string v1, "on"
++
++    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_28
++
++    sget-object v0, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_FPS:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
++
++    invoke-virtual {p0, v0}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->get(Lcom/oplus/ocs/camera/metadata/RequestKey;)Ljava/lang/Object;
++
++    move-result-object v0
++
++    const-string v1, "video_30fps"
++
++    invoke-virtual {v1, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_28
++
++    if-eqz p1, :cond_28
++
++    invoke-virtual {p1}, Landroid/util/Size;->getWidth()I
++
++    move-result v0
++
++    const/16 v1, 0x780
++
++    if-gt v0, v1, :cond_28
++
++    const/4 v0, 0x1
++
++    return v0
++
++    :cond_28
++    const/4 v0, 0x0
++
++    return v0
++.end method
++
+ .method public static isFeatureConfigLegal(Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;Ljava/util/Map;)Z
+     .locals 9
+     .param p0    # Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;
+@@ -702,7 +755,7 @@
+ .end method
+ 
+ .method private static parserFeatureOperationMode(Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;Ljava/util/Map;)Ljava/lang/String;
+-    .locals 4
++    .locals 6
+     .annotation system Ldalvik/annotation/Signature;
+         value = {
+             "(",
+@@ -716,6 +769,45 @@
+     .end annotation
+ 
+     .line 126
++    invoke-virtual {p0}, Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;->getVideoSurface()Lcom/oplus/ocs/camera/common/surface/SurfaceWrapper;
++
++    move-result-object v5
++
++    if-nez v5, :cond_e
++
++    invoke-virtual {p0}, Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;->getDefaultPreviewSurface()Lcom/oplus/ocs/camera/common/surface/SurfaceWrapper;
++
++    move-result-object v5
++
++    if-nez v5, :cond_e
++
++    const/4 v5, 0x0
++
++    goto :goto_12
++
++    :cond_e
++    invoke-virtual {v5}, Lcom/oplus/ocs/camera/common/surface/SurfaceWrapper;->getAppSurfaceSize()Landroid/util/Size;
++
++    move-result-object v5
++
++    :goto_12
++    invoke-virtual {p0}, Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;->getConfigureParameter()Lcom/oplus/ocs/camera/metadata/parameter/Parameter;
++
++    move-result-object v4
++
++    invoke-static {v4, v5}, Lcom/oplus/ocs/camera/producer/decision/OperationModeDecision;->halHlg(Lcom/oplus/ocs/camera/metadata/parameter/Parameter;Landroid/util/Size;)Z
++
++    move-result v4
++
++    sput-boolean v4, Lcom/oplus/ocs/camera/producer/decision/OperationModeDecision;->sHalHlg:Z
++
++    if-eqz v4, :cond_21
++
++    const-string v4, "80a4"
++
++    return-object v4
++
++    :cond_21
+     invoke-virtual {p0}, Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;->getConfigureParameter()Lcom/oplus/ocs/camera/metadata/parameter/Parameter;
+ 
+     move-result-object v0
+@@ -726,14 +818,14 @@
+ 
+     const/4 v1, 0x0
+ 
+-    if-eqz v0, :cond_65
++    if-eqz v0, :cond_86
+ 
+-    if-nez p1, :cond_e
++    if-nez p1, :cond_2f
+ 
+-    goto :goto_65
++    goto :goto_86
+ 
+     .line 139
+-    :cond_e
++    :cond_2f
+     invoke-static {}, Lcom/oplus/ocs/camera/producer/info/CameraConfigHelper;->getFeatureOperationMode()Ljava/util/Map;
+ 
+     move-result-object v0
+@@ -748,7 +840,7 @@
+ 
+     const-string v2, "OperationModeDecision"
+ 
+-    if-eqz v0, :cond_38
++    if-eqz v0, :cond_59
+ 
+     .line 140
+     invoke-static {}, Lcom/oplus/ocs/camera/producer/info/CameraConfigHelper;->getFeatureOperationMode()Ljava/util/Map;
+@@ -777,12 +869,12 @@
+     invoke-static {v2, v0, v1}, Lcom/oplus/ocs/camera/common/util/CameraUnitLog;->d(Ljava/lang/String;Ljava/util/function/Function;Ljava/lang/Object;)V
+ 
+     .line 145
+-    :cond_38
++    :cond_59
+     invoke-static {v1, p0, p1}, Lcom/oplus/ocs/camera/producer/decision/OperationModeDecision;->parseFeatureOperationPriority(Ljava/util/Set;Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;Ljava/util/Map;)Ljava/lang/String;
+ 
+     move-result-object v0
+ 
+-    if-nez v0, :cond_5c
++    if-nez v0, :cond_7d
+ 
+     .line 148
+     invoke-virtual {p0}, Lcom/oplus/ocs/camera/common/parameter/SdkCameraDeviceConfig;->getConfigureParameter()Lcom/oplus/ocs/camera/metadata/parameter/Parameter;
+@@ -797,12 +889,12 @@
+ 
+     move-result-object v1
+ 
+-    :cond_4a
++    :cond_6b
+     invoke-interface {v1}, Ljava/util/Iterator;->hasNext()Z
+ 
+     move-result v3
+ 
+-    if-eqz v3, :cond_5c
++    if-eqz v3, :cond_7d
+ 
+     invoke-interface {v1}, Ljava/util/Iterator;->next()Ljava/lang/Object;
+ 
+@@ -815,10 +907,10 @@
+ 
+     move-result-object v0
+ 
+-    if-eqz v0, :cond_4a
++    if-eqz v0, :cond_6b
+ 
+     .line 157
+-    :cond_5c
++    :cond_7d
+     new-instance p0, Lcom/oplus/ocs/camera/producer/decision/OperationModeDecision$$ExternalSyntheticLambda4;
+ 
+     invoke-direct {p0}, Lcom/oplus/ocs/camera/producer/decision/OperationModeDecision$$ExternalSyntheticLambda4;-><init>()V
+@@ -827,8 +919,8 @@
+ 
+     return-object v0
+ 
+-    :cond_65
+-    :goto_65
++    :cond_86
++    :goto_86
+     return-object v1
+ .end method
+ 
+diff --git a/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali b/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali
+index fe482522a317ddb63998dfac99bc45dc481e5640..a6aba977cd3a5b31b4cd6fe1d66fbd93788f7b34 100644
+--- a/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali
++++ b/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali
+@@ -9681,7 +9681,7 @@
+ 
+     const/4 v14, -0x1
+ 
+-    sparse-switch v6, :sswitch_data_536
++    sparse-switch v6, :sswitch_data_542
+ 
+     goto :goto_66
+ 
+@@ -9771,9 +9771,9 @@
+ 
+     const-string v15, "on"
+ 
+-    packed-switch v14, :pswitch_data_54c
++    packed-switch v14, :pswitch_data_558
+ 
+-    goto/16 :goto_535
++    goto/16 :goto_540
+ 
+     :pswitch_71
+     const-string v2, "com.oplus.feature.front.camera.zoom.scale.value.enable"
+@@ -10125,7 +10125,7 @@
+     :cond_1a3
+     invoke-direct/range {p0 .. p1}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->setSmvrV2Modes(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;)V
+ 
+-    goto/16 :goto_535
++    goto/16 :goto_540
+ 
+     .line 741
+     :pswitch_1a8
+@@ -10170,7 +10170,7 @@
+     :cond_1cc
+     invoke-static {v1, v3, v11}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->setVideoRecordingState(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;Ljava/lang/String;I)V
+ 
+-    goto/16 :goto_535
++    goto/16 :goto_540
+ 
+     .line 727
+     :pswitch_1d1
+@@ -10221,7 +10221,7 @@
+     .line 736
+     invoke-direct/range {p0 .. p1}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->setSmvrV2Modes(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;)V
+ 
+-    goto/16 :goto_535
++    goto/16 :goto_540
+ 
+     .line 500
+     :pswitch_200
+@@ -10456,13 +10456,24 @@
+ 
+     .line 538
+     :goto_2cb
++    sget-boolean v14, Lcom/oplus/ocs/camera/producer/decision/OperationModeDecision;->sHalHlg:Z
++
++    if-eqz v14, :cond_2d6
++
++    sget-object v14, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_MOVIE_HDR_ENABLE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
++
++    sget-object v7, Lcom/oplus/ocs/camera/common/util/CameraConstant;->STATUS_ON:Ljava/lang/Byte;
++
++    invoke-virtual {v1, v14, v7}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
++
++    :cond_2d6
+     invoke-static/range {p3 .. p3}, Lcom/oplus/ocs/camera/producer/info/CameraCharacteristicsHelper;->getHFRConfigurations(Ljava/lang/String;)[I
+ 
+     move-result-object v14
+ 
+     const-string v7, "VideoMode"
+ 
+-    if-eqz v14, :cond_302
++    if-eqz v14, :cond_30d
+ 
+     .line 539
+     sget-object v14, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_FPS:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10477,14 +10488,14 @@
+ 
+     move-result v11
+ 
+-    if-nez v11, :cond_2e5
++    if-nez v11, :cond_2f0
+ 
+     instance-of v11, v0, Lcom/oplus/ocs/camera/producer/mode/SlowVideoMode;
+ 
+-    if-eqz v11, :cond_2f5
++    if-eqz v11, :cond_300
+ 
+-    :cond_2e5
+-    if-nez v4, :cond_2f5
++    :cond_2f0
++    if-nez v4, :cond_300
+ 
+     .line 540
+     sget-object v4, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_HAL_OUTPUT_BUFFER_COMBINED:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10498,10 +10509,10 @@
+ 
+     invoke-static {v7, v4}, Lcom/oplus/ocs/camera/common/util/CameraUnitLog;->d(Ljava/lang/String;Ljava/util/function/Supplier;)V
+ 
+-    goto :goto_302
++    goto :goto_30d
+ 
+     .line 544
+-    :cond_2f5
++    :cond_300
+     sget-object v4, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_HAL_OUTPUT_BUFFER_COMBINED:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v1, v4, v13}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+@@ -10514,8 +10525,8 @@
+     invoke-static {v7, v4}, Lcom/oplus/ocs/camera/common/util/CameraUnitLog;->d(Ljava/lang/String;Ljava/util/function/Supplier;)V
+ 
+     .line 550
+-    :cond_302
+-    :goto_302
++    :cond_30d
++    :goto_30d
+     sget-object v4, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->AI_NIGHT_VIDEO_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v5, v4}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+@@ -10524,7 +10535,7 @@
+ 
+     const-string v11, "super_stabilization"
+ 
+-    if-eqz v4, :cond_3d0
++    if-eqz v4, :cond_3db
+ 
+     .line 551
+     sget-object v4, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->AI_NIGHT_VIDEO_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10549,7 +10560,7 @@
+ 
+     move-result v18
+ 
+-    if-nez v18, :cond_32d
++    if-nez v18, :cond_338
+ 
+     const-string v2, "super_stabilization_front"
+ 
+@@ -10558,21 +10569,21 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_32b
++    if-eqz v2, :cond_336
+ 
+-    goto :goto_32d
++    goto :goto_338
+ 
+-    :cond_32b
++    :cond_336
+     const/4 v2, 0x0
+ 
+-    goto :goto_32e
++    goto :goto_339
+ 
+-    :cond_32d
+-    :goto_32d
++    :cond_338
++    :goto_338
+     move v2, v9
+ 
+     .line 555
+-    :goto_32e
++    :goto_339
+     sget-object v14, Lcom/oplus/ocs/camera/common/util/CameraConfigBase;->KEY_THIRD_PARY_HVXSHDR_SUPPORT:Lcom/oplus/ocs/camera/common/util/CameraConfigBase$Key;
+ 
+     move-object/from16 v18, v15
+@@ -10591,7 +10602,7 @@
+ 
+     move-result v14
+ 
+-    if-eqz v14, :cond_36d
++    if-eqz v14, :cond_378
+ 
+     .line 558
+     sget-object v15, Lcom/oplus/ocs/camera/common/util/CameraConfigBase;->KEY_THIRD_PARY_NOTNEEDPACKAGES_HVXSHDR_SUPPORT:Lcom/oplus/ocs/camera/common/util/CameraConfigBase$Key;
+@@ -10609,7 +10620,7 @@
+ 
+     move-result v15
+ 
+-    if-nez v15, :cond_361
++    if-nez v15, :cond_36c
+ 
+     .line 561
+     invoke-static {}, Lcom/oplus/ocs/camera/common/util/ContextHolder;->getContext()Landroid/content/Context;
+@@ -10624,12 +10635,12 @@
+ 
+     move-result v15
+ 
+-    if-eqz v15, :cond_361
++    if-eqz v15, :cond_36c
+ 
+     const/4 v14, 0x0
+ 
+     .line 565
+-    :cond_361
++    :cond_36c
+     new-instance v15, Lcom/oplus/ocs/camera/producer/mode/VideoMode$$ExternalSyntheticLambda25;
+ 
+     invoke-direct {v15, v9}, Lcom/oplus/ocs/camera/producer/mode/VideoMode$$ExternalSyntheticLambda25;-><init>(Ljava/lang/String;)V
+@@ -10640,7 +10651,7 @@
+ 
+     invoke-static {v7, v15, v9}, Lcom/oplus/ocs/camera/common/util/CameraUnitLog;->d(Ljava/lang/String;Ljava/util/function/Function;Ljava/lang/Object;)V
+ 
+-    :cond_36d
++    :cond_378
+     const-string v9, "rear_main"
+ 
+     .line 569
+@@ -10648,7 +10659,7 @@
+ 
+     move-result v9
+ 
+-    if-eqz v9, :cond_383
++    if-eqz v9, :cond_38e
+ 
+     sget-object v9, Lcom/oplus/ocs/camera/common/util/CameraConfigBase;->KEY_REAR_HVXSHDR_SUPPORT:Lcom/oplus/ocs/camera/common/util/CameraConfigBase$Key;
+ 
+@@ -10663,15 +10674,15 @@
+ 
+     move-result v9
+ 
+-    if-nez v9, :cond_397
++    if-nez v9, :cond_3a2
+ 
+     .line 571
+-    :cond_383
++    :cond_38e
+     invoke-virtual {v6, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+     move-result v9
+ 
+-    if-eqz v9, :cond_3ad
++    if-eqz v9, :cond_3b8
+ 
+     sget-object v9, Lcom/oplus/ocs/camera/common/util/CameraConfigBase;->KEY_FRONT_HVXSHDR_SUPPORT:Lcom/oplus/ocs/camera/common/util/CameraConfigBase$Key;
+ 
+@@ -10686,20 +10697,20 @@
+ 
+     move-result v9
+ 
+-    if-eqz v9, :cond_3ad
++    if-eqz v9, :cond_3b8
+ 
+     .line 573
+-    :cond_397
++    :cond_3a2
+     invoke-static {}, Lcom/oplus/ocs/camera/common/util/Util;->isSystemCamera()Z
+ 
+     move-result v9
+ 
+-    if-nez v9, :cond_39f
++    if-nez v9, :cond_3aa
+ 
+-    if-eqz v14, :cond_3ad
++    if-eqz v14, :cond_3b8
+ 
+     .line 574
+-    :cond_39f
++    :cond_3aa
+     sget-object v9, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_HVXSHDR_ENABLE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v4}, Ljava/lang/Integer;->intValue()I
+@@ -10715,23 +10726,23 @@
+     invoke-virtual {v1, v9, v14}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 578
+-    :cond_3ad
++    :cond_3b8
+     invoke-virtual {v4}, Ljava/lang/Integer;->intValue()I
+ 
+     move-result v4
+ 
+     const/4 v9, 0x1
+ 
+-    if-ne v9, v4, :cond_3ca
++    if-ne v9, v4, :cond_3d5
+ 
+-    if-nez v2, :cond_3c4
++    if-nez v2, :cond_3cf
+ 
+     .line 580
+     invoke-virtual {v6, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+ 
+     move-result v2
+ 
+-    if-nez v2, :cond_3ca
++    if-nez v2, :cond_3d5
+ 
+     const-string v2, "front_wide"
+ 
+@@ -10740,25 +10751,25 @@
+ 
+     move-result v2
+ 
+-    if-nez v2, :cond_3ca
++    if-nez v2, :cond_3d5
+ 
+     .line 582
+-    :cond_3c4
++    :cond_3cf
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->AI_NIGHT_VIDEO_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v1, v2, v10}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+-    goto :goto_3d7
++    goto :goto_3e2
+ 
+     .line 584
+-    :cond_3ca
++    :cond_3d5
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->AI_NIGHT_VIDEO_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v1, v2, v13}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+-    goto :goto_3d7
++    goto :goto_3e2
+ 
+-    :cond_3d0
++    :cond_3db
+     move-object/from16 v18, v15
+ 
+     .line 587
+@@ -10767,14 +10778,14 @@
+     invoke-virtual {v1, v2, v13}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 590
+-    :goto_3d7
++    :goto_3e2
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_VIDEO_LIVE_PHOTO_OPEN:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v5, v2}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_3ec
++    if-eqz v2, :cond_3f7
+ 
+     .line 591
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_VIDEO_LIVE_PHOTO_OPEN:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10792,14 +10803,14 @@
+     invoke-virtual {v1, v2, v4}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 595
+-    :cond_3ec
++    :cond_3f7
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_STABILIZATION_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v5, v2}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_42b
++    if-eqz v2, :cond_436
+ 
+     .line 596
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_STABILIZATION_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10815,11 +10826,11 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_42b
++    if-eqz v2, :cond_436
+ 
+     iget-object v2, v0, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->mConfigFpsRange:Landroid/util/Range;
+ 
+-    if-eqz v2, :cond_42b
++    if-eqz v2, :cond_436
+ 
+     .line 600
+     new-instance v2, Lcom/oplus/ocs/camera/producer/mode/VideoMode$$ExternalSyntheticLambda26;
+@@ -10846,16 +10857,16 @@
+ 
+     const/16 v6, 0x1e
+ 
+-    if-ne v6, v4, :cond_422
++    if-ne v6, v4, :cond_42d
+ 
+     const/4 v7, 0x1
+ 
+-    goto :goto_423
++    goto :goto_42e
+ 
+-    :cond_422
++    :cond_42d
+     const/4 v7, 0x2
+ 
+-    :goto_423
++    :goto_42e
+     invoke-static {v7}, Ljava/lang/Integer;->valueOf(I)Ljava/lang/Integer;
+ 
+     move-result-object v4
+@@ -10863,13 +10874,13 @@
+     .line 602
+     invoke-virtual {v1, v2, v4}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+-    goto :goto_42d
++    goto :goto_438
+ 
+-    :cond_42b
++    :cond_436
+     const/16 v6, 0x1e
+ 
+     .line 607
+-    :goto_42d
++    :goto_438
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_TUNING_DATA_ENABLE:Lcom/oplus/ocs/camera/metadata/RequestKey;
+ 
+     const/4 v4, 0x1
+@@ -10913,7 +10924,7 @@
+ 
+     iget-object v4, v0, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->mConfigFpsRange:Landroid/util/Range;
+ 
+-    if-eqz v4, :cond_463
++    if-eqz v4, :cond_46e
+ 
+     invoke-virtual {v4}, Landroid/util/Range;->getUpper()Ljava/lang/Comparable;
+ 
+@@ -10925,12 +10936,12 @@
+ 
+     move-result v4
+ 
+-    goto :goto_464
++    goto :goto_46f
+ 
+-    :cond_463
++    :cond_46e
+     move v4, v6
+ 
+-    :goto_464
++    :goto_46f
+     invoke-virtual {v2, v4}, Lcom/oplus/ocs/camera/common/statistics/StatisticsManager;->setVideoFps(I)V
+ 
+     .line 616
+@@ -10946,7 +10957,7 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_49c
++    if-eqz v2, :cond_4a7
+ 
+     .line 617
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_STABILIZATION_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10955,7 +10966,7 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_497
++    if-eqz v2, :cond_4a2
+ 
+     .line 618
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->VIDEO_STABILIZATION_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -10971,37 +10982,37 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_491
++    if-eqz v2, :cond_49c
+ 
+     .line 621
+     sget-object v2, Landroid/hardware/camera2/CaptureRequest;->CONTROL_VIDEO_STABILIZATION_MODE:Landroid/hardware/camera2/CaptureRequest$Key;
+ 
+     invoke-virtual {v1, v2, v10}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Landroid/hardware/camera2/CaptureRequest$Key;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+-    goto :goto_49c
++    goto :goto_4a7
+ 
+     .line 624
+-    :cond_491
++    :cond_49c
+     sget-object v2, Landroid/hardware/camera2/CaptureRequest;->CONTROL_VIDEO_STABILIZATION_MODE:Landroid/hardware/camera2/CaptureRequest$Key;
+ 
+     invoke-virtual {v1, v2, v13}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Landroid/hardware/camera2/CaptureRequest$Key;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+-    goto :goto_49c
++    goto :goto_4a7
+ 
+     .line 628
+-    :cond_497
++    :cond_4a2
+     sget-object v2, Landroid/hardware/camera2/CaptureRequest;->CONTROL_VIDEO_STABILIZATION_MODE:Landroid/hardware/camera2/CaptureRequest$Key;
+ 
+     invoke-virtual {v1, v2, v13}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Landroid/hardware/camera2/CaptureRequest$Key;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 633
+-    :cond_49c
+-    :goto_49c
++    :cond_4a7
++    :goto_4a7
+     invoke-direct {v0, v3}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->isHighPreview(Ljava/lang/String;)Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_4a7
++    if-eqz v2, :cond_4b2
+ 
+     .line 634
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_VIDEO_EIS_MODE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -11009,14 +11020,14 @@
+     invoke-virtual {v1, v2, v8}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 637
+-    :cond_4a7
++    :cond_4b2
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_CONFIGURE_GLOBAL_EV_VALUE:Lcom/oplus/ocs/camera/metadata/RequestKey;
+ 
+     invoke-virtual {v5, v2}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_4bc
++    if-eqz v2, :cond_4c7
+ 
+     .line 638
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->CONFIGURE_AE_EXPOSURE_COMPENSATION:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -11034,14 +11045,14 @@
+     invoke-virtual {v1, v2, v4}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 642
+-    :cond_4bc
++    :cond_4c7
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_DUAL_SCENE_MASTER:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v5, v2}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_4d1
++    if-eqz v2, :cond_4dc
+ 
+     .line 643
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->KEY_DUAL_SCENE_MASTER:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -11059,14 +11070,14 @@
+     invoke-virtual {v1, v2, v4}, Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;->set(Lcom/oplus/ocs/camera/metadata/RequestKey;Ljava/lang/Object;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter$BaseBuilder;
+ 
+     .line 647
+-    :cond_4d1
++    :cond_4dc
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->QUICK_MULTI_VIDEO_ENABLE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+     invoke-virtual {v5, v2}, Lcom/oplus/ocs/camera/metadata/parameter/Parameter;->containCustomKey(Lcom/oplus/ocs/camera/metadata/RequestKey;)Z
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_513
++    if-eqz v2, :cond_51e
+ 
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->QUICK_MULTI_VIDEO_ENABLE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+ 
+@@ -11081,7 +11092,7 @@
+ 
+     move-result v2
+ 
+-    if-eqz v2, :cond_513
++    if-eqz v2, :cond_51e
+ 
+     .line 649
+     sget-object v2, Lcom/oplus/ocs/camera/metadata/UConfigureKeys;->QUICK_MULTI_VIDEO_ENABLE:Lcom/oplus/ocs/camera/metadata/ConfigureKey;
+@@ -11129,10 +11140,10 @@
+     .line 652
+     iput-object v2, v0, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->mSmvrV2Parm:[I
+ 
+-    goto :goto_51c
++    goto :goto_527
+ 
+     .line 654
+-    :cond_513
++    :cond_51e
+     invoke-direct {v0, v1, v3}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->getSmvrV2Parm(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;Ljava/lang/String;)[I
+ 
+     move-result-object v2
+@@ -11143,7 +11154,7 @@
+     invoke-direct/range {p0 .. p1}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->setSmvrV2Modes(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;)V
+ 
+     .line 658
+-    :goto_51c
++    :goto_527
+     sget-object v0, Lcom/oplus/ocs/camera/common/util/CameraConfigBase;->KEY_SUPPORT_SET_PCRS_BEFORE_STREAM:Lcom/oplus/ocs/camera/common/util/CameraConfigBase$Key;
+ 
+     invoke-static {v0, v12}, Lcom/oplus/ocs/camera/producer/info/CameraConfigHelper;->getConfigValue(Lcom/oplus/ocs/camera/common/util/CameraConfigBase$Key;Ljava/lang/Object;)Ljava/lang/Object;
+@@ -11156,7 +11167,7 @@
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_535
++    if-eqz v0, :cond_540
+ 
+     .line 659
+     invoke-static {}, Lcom/oplus/ocs/camera/platform/PlatformDifferentiation;->getInstance()Lcom/oplus/ocs/camera/platform/PlatformDifferentiation;
+@@ -11165,17 +11176,19 @@
+ 
+     invoke-virtual {v0, v1}, Lcom/oplus/ocs/camera/platform/PlatformDifferentiation;->setNumPCRsBeforeStreamOn(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;)V
+ 
+-    goto :goto_535
++    goto :goto_540
+ 
+     .line 753
+-    :pswitch_532
++    :pswitch_53d
+     invoke-direct {v0, v1, v3, v4}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->updateCaptureRequestTag(Lcom/oplus/ocs/camera/metadata/parameter/PreviewParameter$Builder;Ljava/lang/String;Lcom/oplus/ocs/camera/common/util/CameraRequestTag;)V
+ 
+-    :cond_535
+-    :goto_535
++    :cond_540
++    :goto_540
+     return-void
+ 
+-    :sswitch_data_536
++    nop
++
++    :sswitch_data_542
+     .sparse-switch
+         -0x377cadfa -> :sswitch_5c
+         -0x2ff29d1a -> :sswitch_51
+@@ -11184,9 +11197,9 @@
+         0x7d51cceb -> :sswitch_30
+     .end sparse-switch
+ 
+-    :pswitch_data_54c
++    :pswitch_data_558
+     .packed-switch 0x0
+-        :pswitch_532
++        :pswitch_53d
+         :pswitch_200
+         :pswitch_1d1
+         :pswitch_1a8
