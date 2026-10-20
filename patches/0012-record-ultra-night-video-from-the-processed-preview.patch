@@ -1,0 +1,227 @@
+record ultra night video from the processed preview
+
+CommonVideoMode p2() (classes7 com/oplus/camera/module/a) also returns true while Ultra Night Video is on
+(Pe()), so RecordProcessor records the app's brightened preview with MediaCodec instead of the
+unprocessed HAL stream. The 5.x port carried the same change in R2().
+
+diff --git a/classes7/com/oplus/camera/module/a.smali b/classes7/com/oplus/camera/module/a.smali
+index 02a9b10..db83288 100644
+--- a/classes7/com/oplus/camera/module/a.smali
++++ b/classes7/com/oplus/camera/module/a.smali
+@@ -59301,7 +59301,7 @@
+     const/4 v2, 0x0
+ 
+     .line 65
+-    if-eqz v0, :cond_cd
++    if-eqz v0, :cond_d3
+ 
+     .line 66
+     .line 67
+@@ -59313,7 +59313,7 @@
+     move-result v0
+ 
+     .line 71
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 72
+     .line 73
+@@ -59325,7 +59325,7 @@
+     move-result v0
+ 
+     .line 77
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 78
+     .line 79
+@@ -59337,7 +59337,7 @@
+     move-result v0
+ 
+     .line 83
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 84
+     .line 85
+@@ -59349,7 +59349,7 @@
+     move-result v0
+ 
+     .line 89
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 90
+     .line 91
+@@ -59361,7 +59361,13 @@
+     move-result v0
+ 
+     .line 95
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
++
++    invoke-virtual {p0}, Lcom/oplus/camera/module/a;->Pe()Z
++
++    move-result v0
++
++    if-nez v0, :cond_d4
+ 
+     .line 96
+     .line 97
+@@ -59377,7 +59383,7 @@
+     move-result v0
+ 
+     .line 103
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 104
+     .line 105
+@@ -59401,7 +59407,7 @@
+     move-result v0
+ 
+     .line 115
+-    if-eqz v0, :cond_90
++    if-eqz v0, :cond_96
+ 
+     .line 116
+     .line 117
+@@ -59417,7 +59423,7 @@
+     move-result v0
+ 
+     .line 123
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 124
+     .line 125
+@@ -59429,7 +59435,7 @@
+     move-result v0
+ 
+     .line 129
+-    if-eqz v0, :cond_90
++    if-eqz v0, :cond_96
+ 
+     .line 130
+     .line 131
+@@ -59457,11 +59463,11 @@
+     move-result v0
+ 
+     .line 143
+-    if-nez v0, :cond_ce
++    if-nez v0, :cond_d4
+ 
+     .line 144
+     .line 145
+-    :cond_90
++    :cond_96
+     invoke-virtual {p0}, Lcom/oplus/camera/module/BaseMode;->r()Z
+ 
+     .line 146
+@@ -59470,7 +59476,7 @@
+     move-result v0
+ 
+     .line 149
+-    if-eqz v0, :cond_cd
++    if-eqz v0, :cond_d3
+ 
+     .line 150
+     .line 151
+@@ -59486,7 +59492,7 @@
+     move-result v0
+ 
+     .line 157
+-    if-nez v0, :cond_a6
++    if-nez v0, :cond_ac
+ 
+     .line 158
+     .line 159
+@@ -59502,11 +59508,11 @@
+     move-result v0
+ 
+     .line 165
+-    if-eqz v0, :cond_cd
++    if-eqz v0, :cond_d3
+ 
+     .line 166
+     .line 167
+-    :cond_a6
++    :cond_ac
+     invoke-virtual {p0}, Lcom/oplus/camera/module/a;->D6()Z
+ 
+     .line 168
+@@ -59515,7 +59521,7 @@
+     move-result v0
+ 
+     .line 171
+-    if-nez v0, :cond_cd
++    if-nez v0, :cond_d3
+ 
+     .line 172
+     .line 173
+@@ -59527,7 +59533,7 @@
+     move-result v0
+ 
+     .line 177
+-    if-nez v0, :cond_cd
++    if-nez v0, :cond_d3
+ 
+     .line 178
+     .line 179
+@@ -59539,7 +59545,7 @@
+     move-result v0
+ 
+     .line 183
+-    if-nez v0, :cond_cd
++    if-nez v0, :cond_d3
+ 
+     .line 184
+     .line 185
+@@ -59551,7 +59557,7 @@
+     move-result v0
+ 
+     .line 189
+-    if-nez v0, :cond_c4
++    if-nez v0, :cond_ca
+ 
+     .line 190
+     .line 191
+@@ -59563,11 +59569,11 @@
+     move-result p0
+ 
+     .line 195
+-    if-nez p0, :cond_ce
++    if-nez p0, :cond_d4
+ 
+     .line 196
+     .line 197
+-    :cond_c4
++    :cond_ca
+     const-string p0, "com.oplus.feature.front.video.eis.dual.stream.support"
+ 
+     .line 198
+@@ -59580,19 +59586,19 @@
+     move-result p0
+ 
+     .line 203
+-    if-nez p0, :cond_cd
++    if-nez p0, :cond_d3
+ 
+     .line 204
+     .line 205
+-    goto :goto_ce
++    goto :goto_d4
+ 
+     .line 206
+-    :cond_cd
++    :cond_d3
+     move v1, v2
+ 
+     .line 207
+-    :cond_ce
+-    :goto_ce
++    :cond_d4
++    :goto_d4
+     return v1
+     .line 208
+     .line 209
