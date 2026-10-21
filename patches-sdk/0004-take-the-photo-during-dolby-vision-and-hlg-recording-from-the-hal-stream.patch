@@ -1,0 +1,25 @@
+take the photo during dolby vision and hlg recording from the hal stream
+
+classes com/oplus/ocs/camera/producer/mode/VideoMode isVideoSnapShotByAps() sent every Dolby Vision / HLG session
+to APS, which cuts the photo out of the 10-bit preview frame (QTI P010, 0x7fa30c0a). The OnePlus 9's APS
+(/odm/lib64/libAlgoProcess.so) cannot JPEG-encode P010 ("swJpegWriteYUVData() not support format: 2141391882")
+and every photo taken while recording came out green. Without that clause a 10-bit session takes the photo from
+the HAL capture stream (video_recorder_snapshot_case), the same as plain 10-bit video does; with
+com.oplus.photo.10bit.format = 35 in the odm camera config that stream is 8-bit YUV and APS encodes it.
+VID20261021214440.mp4 (DOVI 8.4, HLG): photos at 21:44:42-44 1080x1920, mean U 126 V 132.
+
+diff --git a/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali b/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali
+index a6aba97..ada74f4 100644
+--- a/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali
++++ b/classes/com/oplus/ocs/camera/producer/mode/VideoMode.smali
+@@ -7225,6 +7225,10 @@
+ 
+     .line 1935
+     :cond_8
++    const/4 v3, 0x1
++
++    goto :cond_39
++
+     invoke-virtual {p0, p1}, Lcom/oplus/ocs/camera/producer/mode/VideoMode;->getConfigureParameter(Ljava/lang/String;)Lcom/oplus/ocs/camera/metadata/parameter/Parameter;
+ 
+     move-result-object v0
