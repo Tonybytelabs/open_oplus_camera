@@ -1,0 +1,222 @@
+put dolby vision audio on the video clock
+
+In a Dolby Vision recording (mm/DV, classes7) the audio samples reach MediaMuxer.writeSampleData with CLOCK_BOOTTIME
+timestamps and the video frames with CLOCK_MONOTONIC ones. Once the phone has slept the two differ by the total sleep
+time, MPEG4Writer gives the audio track an empty edit of that length, and players report a duration of hours
+(VID20261021173522.mp4: audio start 151356.66 s, boottime - monotonic on the phone 151356.7 s). The muxer
+(mm/i.writeSampleData) has already subtracted the first video key frame time from every sample when DV.sample()
+sees it, so a correct audio timestamp is near 0 and a boot-clock one near the clock gap. DV.sample() now shifts each
+audio sample of a Dolby Vision recording by that gap when the recorder's first audio timestamp is nearer the gap
+than 0. Source: .claude/tools/cam7/dolby/mm/DV.java.
+
+diff --git b/classes7/mm/DV.smali c/classes7/mm/DV.smali
+index 69d530f..5ec4698 100644
+--- b/classes7/mm/DV.smali
++++ c/classes7/mm/DV.smali
+@@ -19,6 +19,10 @@
+     .end annotation
+ .end field
+ 
++.field static clockFor:Lmm/i;
++
++.field static clockGapUs:J
++
+ .field static volatile dolby:Z
+ 
+ .field static last:Z
+@@ -458,6 +462,81 @@
+     return-void
+ .end method
+ 
++.method static audioClock(Lmm/i;Landroid/media/MediaCodec$BufferInfo;)V
++    .locals 6
++
++    .line 98
++    sget-object v0, Lmm/DV;->clockFor:Lmm/i;
++
++    if-eq v0, p0, :cond_30
++
++    .line 99
++    sput-object p0, Lmm/DV;->clockFor:Lmm/i;
++
++    .line 100
++    invoke-static {}, Landroid/os/SystemClock;->elapsedRealtimeNanos()J
++
++    move-result-wide v0
++
++    const-wide/16 v2, 0x3e8
++
++    div-long/2addr v0, v2
++
++    invoke-static {}, Ljava/lang/System;->nanoTime()J
++
++    move-result-wide v4
++
++    div-long/2addr v4, v2
++
++    sub-long/2addr v0, v4
++
++    .line 101
++    const-wide/32 v2, 0xf4240
++
++    cmp-long p0, v0, v2
++
++    if-lez p0, :cond_2c
++
++    iget-wide v2, p1, Landroid/media/MediaCodec$BufferInfo;->presentationTimeUs:J
++
++    sub-long/2addr v2, v0
++
++    invoke-static {v2, v3}, Ljava/lang/Math;->abs(J)J
++
++    move-result-wide v2
++
++    iget-wide v4, p1, Landroid/media/MediaCodec$BufferInfo;->presentationTimeUs:J
++
++    invoke-static {v4, v5}, Ljava/lang/Math;->abs(J)J
++
++    move-result-wide v4
++
++    cmp-long p0, v2, v4
++
++    if-gez p0, :cond_2c
++
++    goto :goto_2e
++
++    :cond_2c
++    const-wide/16 v0, 0x0
++
++    :goto_2e
++    sput-wide v0, Lmm/DV;->clockGapUs:J
++
++    .line 103
++    :cond_30
++    iget-wide v0, p1, Landroid/media/MediaCodec$BufferInfo;->presentationTimeUs:J
++
++    sget-wide v2, Lmm/DV;->clockGapUs:J
++
++    sub-long/2addr v0, v2
++
++    iput-wide v0, p1, Landroid/media/MediaCodec$BufferInfo;->presentationTimeUs:J
++
++    .line 104
++    return-void
++.end method
++
+ .method public static click(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+     .locals 1
+ 
+@@ -768,31 +847,55 @@
+ .method public static sample(Lmm/i;ILjava/nio/ByteBuffer;Landroid/media/MediaCodec$BufferInfo;)Ljava/nio/ByteBuffer;
+     .locals 6
+ 
+-    .line 91
++    .line 106
++    invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_17
++
++    iget v0, p0, Lmm/i;->z:I
++
++    if-eq p1, v0, :cond_17
++
++    iget v0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
++
++    if-lez v0, :cond_17
++
++    iget v0, p3, Landroid/media/MediaCodec$BufferInfo;->flags:I
++
++    and-int/lit8 v0, v0, 0x2
++
++    if-nez v0, :cond_17
++
++    invoke-static {p0, p3}, Lmm/DV;->audioClock(Lmm/i;Landroid/media/MediaCodec$BufferInfo;)V
++
++    .line 107
++    :cond_17
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+ 
+-    if-eqz v0, :cond_4c
++    if-eqz v0, :cond_63
+ 
+     iget p0, p0, Lmm/i;->z:I
+ 
+-    if-ne p1, p0, :cond_4c
++    if-ne p1, p0, :cond_63
+ 
+     iget p0, p3, Landroid/media/MediaCodec$BufferInfo;->flags:I
+ 
+     and-int/lit8 p0, p0, 0x2
+ 
+-    if-nez p0, :cond_4c
++    if-nez p0, :cond_63
+ 
+     iget p0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+ 
+-    if-gtz p0, :cond_15
++    if-gtz p0, :cond_2c
+ 
+-    goto :goto_4c
++    goto :goto_63
+ 
+-    .line 92
+-    :cond_15
++    .line 108
++    :cond_2c
+     iget p0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+ 
+     sget-object p1, Lmm/DV;->RPU:[B
+@@ -805,12 +908,12 @@
+ 
+     move-result-object p0
+ 
+-    .line 93
++    .line 109
+     invoke-virtual {p2}, Ljava/nio/ByteBuffer;->duplicate()Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+ 
+-    .line 94
++    .line 110
+     iget p2, p3, Landroid/media/MediaCodec$BufferInfo;->offset:I
+ 
+     iget v0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+@@ -825,7 +928,7 @@
+ 
+     invoke-virtual {p2, v0}, Ljava/nio/ByteBuffer;->position(I)Ljava/nio/ByteBuffer;
+ 
+-    .line 95
++    .line 111
+     invoke-virtual {p0, p1}, Ljava/nio/ByteBuffer;->put(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+@@ -838,7 +941,7 @@
+ 
+     invoke-virtual {p1}, Ljava/nio/ByteBuffer;->flip()Ljava/nio/ByteBuffer;
+ 
+-    .line 96
++    .line 112
+     invoke-virtual {p0}, Ljava/nio/ByteBuffer;->limit()I
+ 
+     move-result v2
+@@ -853,12 +956,12 @@
+ 
+     invoke-virtual/range {v0 .. v5}, Landroid/media/MediaCodec$BufferInfo;->set(IIJI)V
+ 
+-    .line 97
++    .line 113
+     return-object p0
+ 
+-    .line 91
+-    :cond_4c
+-    :goto_4c
++    .line 107
++    :cond_63
++    :goto_63
+     return-object p2
+ .end method
+ 
