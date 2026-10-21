@@ -1,0 +1,1080 @@
+keep HEIF and HEVC on with 10-bit color, and put them back after
+
+Settings > Formats (classes7 com/oplus/camera/setting/h2 s(), onPreferenceChange) now calls mm/DV formats(), which
+runs after the stock handler and then sets the three switches from the stored values:
+- "10-bit color" on: the HEIF (n9.d B0/C0) and HEVC (n9.d z0, n9.f p) values are saved in
+  pref_10bit_photo_codec_before / pref_10bit_video_codec_before, then both are set on.
+- "10-bit color" off: both go back to the saved values.
+- HEIF off while 10-bit is on: 10-bit goes off, HEVC goes back to its saved value.
+- HEVC off while 10-bit is on: 10-bit goes off, HEIF goes back to its saved value.
+mm/DV resume() (camera onResume) applies the same rule to an existing 10-bit-on state. With 10-bit on, C0 (the
+codec the mode-start rewrite in com/oplus/camera/nb restores outside 10-bit modes) is HEIF, so Settings no longer
+shows HEIF off after a visit to Video. With 10-bit off both are plain 8-bit (IMG20261021213131.heic: hevc Main
+yuv420p tiles; VID20261021213127.mp4: hevc Main yuv420p). Source: .claude/tools/cam7/dolby/mm/DV.java.
+
+diff --git a/classes7/com/oplus/camera/setting/h2.smali b/classes7/com/oplus/camera/setting/h2.smali
+index d1d9ae7..6a13cf0 100644
+--- a/classes7/com/oplus/camera/setting/h2.smali
++++ b/classes7/com/oplus/camera/setting/h2.smali
+@@ -44542,6 +44542,8 @@
+ .method public final s(Landroidx/preference/Preference;Ljava/lang/Object;)Z
+     .locals 10
+ 
++    invoke-static {p0, p1, p2}, Lmm/DV;->formats(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V
++
+     const-string v0, "CameraSubSettingFragment"
+ 
+     const-string v1, "onPreferenceChange"
+diff --git a/classes7/mm/DV.smali b/classes7/mm/DV.smali
+index 5ec4698..6c68998 100644
+--- a/classes7/mm/DV.smali
++++ b/classes7/mm/DV.smali
+@@ -27,8 +27,42 @@
+ 
+ .field static last:Z
+ 
++.field static photoBak:Lcom/oplus/camera/data/DataKey;
++    .annotation system Ldalvik/annotation/Signature;
++        value = {
++            "Lcom/oplus/camera/data/DataKey<",
++            "Ljava/lang/String;",
++            ">;"
++        }
++    .end annotation
++.end field
++
+ .field static seen:Z
+ 
++.field static videoBak:Lcom/oplus/camera/data/DataKey;
++    .annotation system Ldalvik/annotation/Signature;
++        value = {
++            "Lcom/oplus/camera/data/DataKey<",
++            "Ljava/lang/String;",
++            ">;"
++        }
++    .end annotation
++.end field
++
++
++# instance fields
++.field c0Was:Ljava/lang/String;
++
++.field fmt:Lcom/oplus/camera/setting/h2;
++
++.field on:Z
++
++.field tenWas:Z
++
++.field which:I
++
++.field z0Was:Ljava/lang/String;
++
+ 
+ # direct methods
+ .method static constructor <clinit>()V
+@@ -465,15 +499,15 @@
+ .method static audioClock(Lmm/i;Landroid/media/MediaCodec$BufferInfo;)V
+     .locals 6
+ 
+-    .line 98
++    .line 182
+     sget-object v0, Lmm/DV;->clockFor:Lmm/i;
+ 
+     if-eq v0, p0, :cond_30
+ 
+-    .line 99
++    .line 183
+     sput-object p0, Lmm/DV;->clockFor:Lmm/i;
+ 
+-    .line 100
++    .line 184
+     invoke-static {}, Landroid/os/SystemClock;->elapsedRealtimeNanos()J
+ 
+     move-result-wide v0
+@@ -490,7 +524,7 @@
+ 
+     sub-long/2addr v0, v4
+ 
+-    .line 101
++    .line 185
+     const-wide/32 v2, 0xf4240
+ 
+     cmp-long p0, v0, v2
+@@ -523,7 +557,7 @@
+     :goto_2e
+     sput-wide v0, Lmm/DV;->clockGapUs:J
+ 
+-    .line 103
++    .line 187
+     :cond_30
+     iget-wide v0, p1, Landroid/media/MediaCodec$BufferInfo;->presentationTimeUs:J
+ 
+@@ -533,7 +567,7 @@
+ 
+     iput-wide v0, p1, Landroid/media/MediaCodec$BufferInfo;->presentationTimeUs:J
+ 
+-    .line 104
++    .line 188
+     return-void
+ .end method
+ 
+@@ -660,13 +694,316 @@
+     return p0
+ .end method
+ 
++.method static enforce()V
++    .locals 6
++
++    .line 133
++    const-string v0, "H265"
++
++    const-string v1, "JPEG"
++
++    const-string v2, "HEIF"
++
++    :try_start_6
++    const-string v3, "on"
++
++    sget-object v4, Ln9/d;->N0:Lcom/oplus/camera/data/DataKey;
++
++    const-string v5, "off"
++
++    invoke-static {v4, v5}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v4
++
++    invoke-virtual {v3, v4}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v3
++
++    if-nez v3, :cond_17
++
++    return-void
++
++    .line 134
++    :cond_17
++    invoke-static {}, Lmm/DV;->keys()V
++
++    .line 135
++    sget-object v3, Ln9/d;->C0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v3, v1}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v3
++
++    invoke-virtual {v2, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v3
++
++    const/4 v4, 0x0
++
++    if-nez v3, :cond_3d
++
++    .line 136
++    sget-object v3, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v3, v4}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v3
++
++    if-nez v3, :cond_3a
++
++    sget-object v3, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    sget-object v5, Ln9/d;->C0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v5, v1}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v1
++
++    invoke-static {v3, v1}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    .line 137
++    :cond_3a
++    invoke-static {v2}, Lmm/DV;->photo(Ljava/lang/String;)V
++
++    .line 139
++    :cond_3d
++    invoke-static {}, Lmm/DV;->videoNow()Ljava/lang/String;
++
++    move-result-object v1
++
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    if-nez v1, :cond_5d
++
++    .line 140
++    sget-object v1, Lmm/DV;->videoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v1, v4}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v1
++
++    if-nez v1, :cond_58
++
++    sget-object v1, Lmm/DV;->videoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {}, Lmm/DV;->videoNow()Ljava/lang/String;
++
++    move-result-object v2
++
++    invoke-static {v1, v2}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    .line 141
++    :cond_58
++    invoke-static {v0}, Lmm/DV;->video(Ljava/lang/String;)V
++    :try_end_5b
++    .catchall {:try_start_6 .. :try_end_5b} :catchall_5c
++
++    goto :goto_5d
++
++    .line 143
++    :catchall_5c
++    move-exception v0
++
++    :cond_5d
++    :goto_5d
++    nop
++
++    .line 144
++    return-void
++.end method
++
++.method public static formats(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V
++    .locals 2
++
++    .line 92
++    :try_start_0
++    instance-of v0, p0, Lcom/oplus/camera/setting/h2;
++
++    if-eqz v0, :cond_64
++
++    instance-of v0, p2, Ljava/lang/Boolean;
++
++    if-nez v0, :cond_9
++
++    goto :goto_64
++
++    .line 93
++    :cond_9
++    check-cast p0, Lcom/oplus/camera/setting/h2;
++
++    .line 94
++    const/4 v0, 0x0
++
++    if-nez p1, :cond_f
++
++    :cond_e
++    goto :goto_20
++
++    :cond_f
++    iget-object v1, p0, Lcom/oplus/camera/setting/h2;->t3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    if-ne p1, v1, :cond_15
++
++    const/4 v0, 0x1
++
++    goto :goto_20
++
++    :cond_15
++    iget-object v1, p0, Lcom/oplus/camera/setting/h2;->v3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    if-ne p1, v1, :cond_1b
++
++    const/4 v0, 0x2
++
++    goto :goto_20
++
++    :cond_1b
++    iget-object v1, p0, Lcom/oplus/camera/setting/h2;->y3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    if-ne p1, v1, :cond_e
++
++    const/4 v0, 0x3
++
++    .line 95
++    :goto_20
++    if-nez v0, :cond_23
++
++    return-void
++
++    .line 96
++    :cond_23
++    invoke-static {}, Lmm/DV;->keys()V
++
++    .line 97
++    new-instance p1, Lmm/DV;
++
++    invoke-direct {p1}, Lmm/DV;-><init>()V
++
++    .line 98
++    iput-object p0, p1, Lmm/DV;->fmt:Lcom/oplus/camera/setting/h2;
++
++    iput v0, p1, Lmm/DV;->which:I
++
++    check-cast p2, Ljava/lang/Boolean;
++
++    invoke-virtual {p2}, Ljava/lang/Boolean;->booleanValue()Z
++
++    move-result p0
++
++    iput-boolean p0, p1, Lmm/DV;->on:Z
++
++    .line 99
++    const-string p0, "on"
++
++    sget-object p2, Ln9/d;->N0:Lcom/oplus/camera/data/DataKey;
++
++    const-string v0, "off"
++
++    invoke-static {p2, v0}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object p2
++
++    invoke-virtual {p0, p2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result p0
++
++    iput-boolean p0, p1, Lmm/DV;->tenWas:Z
++
++    .line 100
++    sget-object p0, Ln9/d;->C0:Lcom/oplus/camera/data/DataKey;
++
++    const-string p2, "JPEG"
++
++    invoke-static {p0, p2}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object p0
++
++    iput-object p0, p1, Lmm/DV;->c0Was:Ljava/lang/String;
++
++    .line 101
++    invoke-static {}, Lmm/DV;->videoNow()Ljava/lang/String;
++
++    move-result-object p0
++
++    iput-object p0, p1, Lmm/DV;->z0Was:Ljava/lang/String;
++
++    .line 102
++    new-instance p0, Landroid/os/Handler;
++
++    invoke-static {}, Landroid/os/Looper;->getMainLooper()Landroid/os/Looper;
++
++    move-result-object p2
++
++    invoke-direct {p0, p2}, Landroid/os/Handler;-><init>(Landroid/os/Looper;)V
++
++    invoke-virtual {p0, p1}, Landroid/os/Handler;->post(Ljava/lang/Runnable;)Z
++    :try_end_63
++    .catchall {:try_start_0 .. :try_end_63} :catchall_65
++
++    goto :goto_66
++
++    .line 92
++    :cond_64
++    :goto_64
++    return-void
++
++    .line 103
++    :catchall_65
++    move-exception p0
++
++    :goto_66
++    nop
++
++    .line 104
++    return-void
++.end method
++
++.method static get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++    .locals 1
++    .annotation system Ldalvik/annotation/Signature;
++        value = {
++            "(",
++            "Lcom/oplus/camera/data/DataKey<",
++            "Ljava/lang/String;",
++            ">;",
++            "Ljava/lang/String;",
++            ")",
++            "Ljava/lang/String;"
++        }
++    .end annotation
++
++    .line 76
++    invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
++
++    move-result-object v0
++
++    invoke-virtual {v0, p0, p1}, Lcom/oplus/camera/data/DataManager;->b(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)Ljava/lang/Object;
++
++    move-result-object p0
++
++    check-cast p0, Ljava/lang/String;
++
++    .line 77
++    if-nez p0, :cond_d
++
++    goto :goto_e
++
++    :cond_d
++    move-object p1, p0
++
++    :goto_e
++    return-object p1
++.end method
++
+ .method public static in(Lmm/i;)V
+     .locals 3
+ 
+-    .line 74
++    .line 158
+     iget-object v0, p0, Lmm/i;->h0:Landroid/media/MediaFormat;
+ 
+-    .line 75
++    .line 159
+     if-eqz v0, :cond_28
+ 
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+@@ -677,7 +1014,7 @@
+ 
+     goto :goto_28
+ 
+-    .line 76
++    .line 160
+     :cond_b
+     const-string p0, "profile"
+ 
+@@ -685,43 +1022,80 @@
+ 
+     invoke-virtual {v0, p0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 77
++    .line 161
+     const-string p0, "level"
+ 
+     invoke-virtual {v0, p0}, Landroid/media/MediaFormat;->removeKey(Ljava/lang/String;)V
+ 
+-    .line 78
++    .line 162
+     const-string p0, "color-standard"
+ 
+     const/4 v2, 0x6
+ 
+     invoke-virtual {v0, p0, v2}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 79
++    .line 163
+     const-string p0, "color-transfer"
+ 
+     const/4 v2, 0x7
+ 
+     invoke-virtual {v0, p0, v2}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 80
++    .line 164
+     const-string p0, "color-range"
+ 
+     invoke-virtual {v0, p0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 81
++    .line 165
+     return-void
+ 
+-    .line 75
++    .line 159
+     :cond_28
+     :goto_28
+     return-void
+ .end method
+ 
++.method static keys()V
++    .locals 2
++
++    .line 85
++    sget-object v0, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    if-eqz v0, :cond_5
++
++    return-void
++
++    .line 86
++    :cond_5
++    const-class v0, Ljava/lang/String;
++
++    const-string v1, "pref_10bit_photo_codec_before"
++
++    invoke-static {v0, v1}, Landroidx/preference/e;->b0(Ljava/lang/Class;Ljava/lang/String;)Lcom/oplus/camera/data/DataKey;
++
++    move-result-object v0
++
++    sput-object v0, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    .line 87
++    const-class v0, Ljava/lang/String;
++
++    const-string v1, "pref_10bit_video_codec_before"
++
++    invoke-static {v0, v1}, Landroidx/preference/e;->b0(Ljava/lang/Class;Ljava/lang/String;)Lcom/oplus/camera/data/DataKey;
++
++    move-result-object v0
++
++    sput-object v0, Lmm/DV;->videoBak:Lcom/oplus/camera/data/DataKey;
++
++    .line 88
++    return-void
++.end method
++
+ .method public static out(Lmm/i;Landroid/media/MediaFormat;)V
+     .locals 3
+ 
+-    .line 84
++    .line 168
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+@@ -744,35 +1118,73 @@
+ 
+     goto :goto_29
+ 
+-    .line 85
++    .line 169
+     :cond_15
+     const-string v0, "video/dolby-vision"
+ 
+     invoke-virtual {p1, v1, v0}, Landroid/media/MediaFormat;->setString(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    .line 86
++    .line 170
+     const-string v0, "profile"
+ 
+     const/16 v1, 0x100
+ 
+     invoke-virtual {p1, v0, v1}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 87
++    .line 171
+     const-string v0, "level"
+ 
+     iget p0, p0, Lmm/i;->g1:I
+ 
+     invoke-virtual {p1, v0, p0}, Landroid/media/MediaFormat;->setInteger(Ljava/lang/String;I)V
+ 
+-    .line 88
++    .line 172
+     return-void
+ 
+-    .line 84
++    .line 168
+     :cond_29
+     :goto_29
+     return-void
+ .end method
+ 
++.method static photo(Ljava/lang/String;)V
++    .locals 1
++
++    .line 80
++    sget-object v0, Ln9/d;->B0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, p0}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    sget-object v0, Ln9/d;->C0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, p0}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    return-void
++.end method
++
++.method static put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++    .locals 1
++    .annotation system Ldalvik/annotation/Signature;
++        value = {
++            "(",
++            "Lcom/oplus/camera/data/DataKey<",
++            "Ljava/lang/String;",
++            ">;",
++            "Ljava/lang/String;",
++            ")V"
++        }
++    .end annotation
++
++    .line 79
++    invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
++
++    move-result-object v0
++
++    invoke-virtual {v0, p0, p1}, Lcom/oplus/camera/data/DataManager;->g(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;)V
++
++    return-void
++.end method
++
+ .method static rebuild()V
+     .locals 2
+ 
+@@ -805,26 +1217,29 @@
+ .method public static resume(Landroid/app/Activity;)V
+     .locals 2
+ 
+-    .line 67
++    .line 150
+     new-instance v0, Ljava/lang/ref/WeakReference;
+ 
+     invoke-direct {v0, p0}, Ljava/lang/ref/WeakReference;-><init>(Ljava/lang/Object;)V
+ 
+     sput-object v0, Lmm/DV;->act:Ljava/lang/ref/WeakReference;
+ 
+-    .line 68
++    .line 151
++    invoke-static {}, Lmm/DV;->enforce()V
++
++    .line 152
+     invoke-static {}, Lmm/DV;->tenBit()Z
+ 
+     move-result v0
+ 
+-    .line 69
++    .line 153
+     sget-boolean v1, Lmm/DV;->seen:Z
+ 
+-    if-eqz v1, :cond_19
++    if-eqz v1, :cond_1c
+ 
+     sget-boolean v1, Lmm/DV;->last:Z
+ 
+-    if-eq v0, v1, :cond_19
++    if-eq v0, v1, :cond_1c
+ 
+     sput-boolean v0, Lmm/DV;->last:Z
+ 
+@@ -832,22 +1247,22 @@
+ 
+     return-void
+ 
+-    .line 70
+-    :cond_19
++    .line 154
++    :cond_1c
+     const/4 p0, 0x1
+ 
+     sput-boolean p0, Lmm/DV;->seen:Z
+ 
+     sput-boolean v0, Lmm/DV;->last:Z
+ 
+-    .line 71
++    .line 155
+     return-void
+ .end method
+ 
+ .method public static sample(Lmm/i;ILjava/nio/ByteBuffer;Landroid/media/MediaCodec$BufferInfo;)Ljava/nio/ByteBuffer;
+     .locals 6
+ 
+-    .line 106
++    .line 190
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+     move-result v0
+@@ -870,7 +1285,7 @@
+ 
+     invoke-static {p0, p3}, Lmm/DV;->audioClock(Lmm/i;Landroid/media/MediaCodec$BufferInfo;)V
+ 
+-    .line 107
++    .line 191
+     :cond_17
+     invoke-static {p0}, Lmm/DV;->dv(Lmm/i;)Z
+ 
+@@ -894,7 +1309,7 @@
+ 
+     goto :goto_63
+ 
+-    .line 108
++    .line 192
+     :cond_2c
+     iget p0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+ 
+@@ -908,12 +1323,12 @@
+ 
+     move-result-object p0
+ 
+-    .line 109
++    .line 193
+     invoke-virtual {p2}, Ljava/nio/ByteBuffer;->duplicate()Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+ 
+-    .line 110
++    .line 194
+     iget p2, p3, Landroid/media/MediaCodec$BufferInfo;->offset:I
+ 
+     iget v0, p3, Landroid/media/MediaCodec$BufferInfo;->size:I
+@@ -928,7 +1343,7 @@
+ 
+     invoke-virtual {p2, v0}, Ljava/nio/ByteBuffer;->position(I)Ljava/nio/ByteBuffer;
+ 
+-    .line 111
++    .line 195
+     invoke-virtual {p0, p1}, Ljava/nio/ByteBuffer;->put(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
+ 
+     move-result-object p1
+@@ -941,7 +1356,7 @@
+ 
+     invoke-virtual {p1}, Ljava/nio/ByteBuffer;->flip()Ljava/nio/ByteBuffer;
+ 
+-    .line 112
++    .line 196
+     invoke-virtual {p0}, Ljava/nio/ByteBuffer;->limit()I
+ 
+     move-result v2
+@@ -956,15 +1371,90 @@
+ 
+     invoke-virtual/range {v0 .. v5}, Landroid/media/MediaCodec$BufferInfo;->set(IIJI)V
+ 
+-    .line 113
++    .line 197
+     return-object p0
+ 
+-    .line 107
++    .line 191
+     :cond_63
+     :goto_63
+     return-object p2
+ .end method
+ 
++.method static sync(Lcom/oplus/camera/setting/h2;)V
++    .locals 3
++
++    .line 123
++    iget-object v0, p0, Lcom/oplus/camera/setting/h2;->t3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    if-eqz v0, :cond_17
++
++    iget-object v0, p0, Lcom/oplus/camera/setting/h2;->t3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    sget-object v1, Ln9/d;->N0:Lcom/oplus/camera/data/DataKey;
++
++    const-string v2, "off"
++
++    invoke-static {v1, v2}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v1
++
++    const-string v2, "on"
++
++    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    invoke-virtual {v0, v1}, Lcom/oplus/camera/ui/menu/CameraSwitchPreference;->i0(Z)V
++
++    .line 124
++    :cond_17
++    iget-object v0, p0, Lcom/oplus/camera/setting/h2;->v3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    if-eqz v0, :cond_2e
++
++    iget-object v0, p0, Lcom/oplus/camera/setting/h2;->v3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    sget-object v1, Ln9/d;->B0:Lcom/oplus/camera/data/DataKey;
++
++    const-string v2, "JPEG"
++
++    invoke-static {v1, v2}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v1
++
++    const-string v2, "HEIF"
++
++    invoke-virtual {v2, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v1
++
++    invoke-virtual {v0, v1}, Lcom/oplus/camera/ui/menu/CameraSwitchPreference;->i0(Z)V
++
++    .line 125
++    :cond_2e
++    iget-object v0, p0, Lcom/oplus/camera/setting/h2;->y3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    if-eqz v0, :cond_41
++
++    iget-object p0, p0, Lcom/oplus/camera/setting/h2;->y3:Lcom/oplus/camera/ui/menu/CameraSwitchPreference;
++
++    const-string v0, "H265"
++
++    invoke-static {}, Lmm/DV;->videoNow()Ljava/lang/String;
++
++    move-result-object v1
++
++    invoke-virtual {v0, v1}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    invoke-virtual {p0, v0}, Lcom/oplus/camera/ui/menu/CameraSwitchPreference;->i0(Z)V
++
++    .line 126
++    :cond_41
++    return-void
++.end method
++
+ .method public static tenBit()Z
+     .locals 2
+ 
+@@ -998,6 +1488,42 @@
+     return v0
+ .end method
+ 
++.method static video(Ljava/lang/String;)V
++    .locals 3
++
++    .line 81
++    sget-object v0, Ln9/d;->z0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, p0}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    invoke-static {}, Lcom/oplus/camera/data/DataManager;->getInstance()Lcom/oplus/camera/data/DataManager;
++
++    move-result-object v0
++
++    sget-object v1, Ln9/f;->p:Lcom/oplus/camera/data/DataKey;
++
++    const/4 v2, 0x0
++
++    invoke-virtual {v0, v1, p0, v2}, Lcom/oplus/camera/data/DataManager;->h(Lcom/oplus/camera/data/DataKey;Ljava/lang/Object;Z)V
++
++    return-void
++.end method
++
++.method static videoNow()Ljava/lang/String;
++    .locals 2
++
++    .line 82
++    sget-object v0, Ln9/d;->z0:Lcom/oplus/camera/data/DataKey;
++
++    sget-object v1, Lcom/oplus/camera/device/CameraConstant;->n0:Ljava/lang/String;
++
++    invoke-static {v0, v1}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    return-object v0
++.end method
++
+ .method public static want(Lom/t0;)Z
+     .locals 5
+ 
+@@ -1086,19 +1612,186 @@
+ 
+ 
+ # virtual methods
++.method formats()V
++    .locals 5
++
++    .line 108
++    const-string v0, "off"
++
++    :try_start_2
++    iget v1, p0, Lmm/DV;->which:I
++
++    const/4 v2, 0x1
++
++    if-ne v1, v2, :cond_28
++
++    iget-boolean v1, p0, Lmm/DV;->on:Z
++
++    if-eqz v1, :cond_28
++
++    iget-boolean v1, p0, Lmm/DV;->tenWas:Z
++
++    if-nez v1, :cond_28
++
++    .line 109
++    sget-object v0, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    iget-object v1, p0, Lmm/DV;->c0Was:Ljava/lang/String;
++
++    invoke-static {v0, v1}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    sget-object v0, Lmm/DV;->videoBak:Lcom/oplus/camera/data/DataKey;
++
++    iget-object v1, p0, Lmm/DV;->z0Was:Ljava/lang/String;
++
++    invoke-static {v0, v1}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    .line 110
++    const-string v0, "HEIF"
++
++    invoke-static {v0}, Lmm/DV;->photo(Ljava/lang/String;)V
++
++    const-string v0, "H265"
++
++    invoke-static {v0}, Lmm/DV;->video(Ljava/lang/String;)V
++
++    goto :goto_79
++
++    .line 111
++    :cond_28
++    iget v1, p0, Lmm/DV;->which:I
++    :try_end_2a
++    .catchall {:try_start_2 .. :try_end_2a} :catchall_7f
++
++    const-string v3, "H264"
++
++    const-string v4, "JPEG"
++
++    if-ne v1, v2, :cond_4b
++
++    :try_start_30
++    iget-boolean v1, p0, Lmm/DV;->on:Z
++
++    if-nez v1, :cond_4b
++
++    iget-boolean v1, p0, Lmm/DV;->tenWas:Z
++
++    if-eqz v1, :cond_4b
++
++    .line 112
++    sget-object v0, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, v4}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    invoke-static {v0}, Lmm/DV;->photo(Ljava/lang/String;)V
++
++    sget-object v0, Lmm/DV;->videoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, v3}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    invoke-static {v0}, Lmm/DV;->video(Ljava/lang/String;)V
++
++    goto :goto_79
++
++    .line 113
++    :cond_4b
++    iget v1, p0, Lmm/DV;->which:I
++
++    if-eq v1, v2, :cond_79
++
++    iget-boolean v1, p0, Lmm/DV;->on:Z
++
++    if-nez v1, :cond_79
++
++    iget-boolean v1, p0, Lmm/DV;->tenWas:Z
++
++    if-eqz v1, :cond_79
++
++    .line 114
++    sget-object v1, Ln9/d;->N0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v1, v0}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    sget-object v1, Ln9/f;->D0:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v1, v0}, Lmm/DV;->put(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)V
++
++    .line 115
++    iget v0, p0, Lmm/DV;->which:I
++
++    const/4 v1, 0x2
++
++    if-ne v0, v1, :cond_70
++
++    sget-object v0, Lmm/DV;->videoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, v3}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    invoke-static {v0}, Lmm/DV;->video(Ljava/lang/String;)V
++
++    goto :goto_79
++
++    .line 116
++    :cond_70
++    sget-object v0, Lmm/DV;->photoBak:Lcom/oplus/camera/data/DataKey;
++
++    invoke-static {v0, v4}, Lmm/DV;->get(Lcom/oplus/camera/data/DataKey;Ljava/lang/String;)Ljava/lang/String;
++
++    move-result-object v0
++
++    invoke-static {v0}, Lmm/DV;->photo(Ljava/lang/String;)V
++
++    .line 118
++    :cond_79
++    :goto_79
++    iget-object v0, p0, Lmm/DV;->fmt:Lcom/oplus/camera/setting/h2;
++
++    invoke-static {v0}, Lmm/DV;->sync(Lcom/oplus/camera/setting/h2;)V
++    :try_end_7e
++    .catchall {:try_start_30 .. :try_end_7e} :catchall_7f
++
++    goto :goto_80
++
++    .line 119
++    :catchall_7f
++    move-exception v0
++
++    :goto_80
++    nop
++
++    .line 120
++    return-void
++.end method
++
+ .method public run()V
+     .locals 2
+ 
+     .line 59
++    iget-object v0, p0, Lmm/DV;->fmt:Lcom/oplus/camera/setting/h2;
++
++    if-eqz v0, :cond_8
++
++    invoke-virtual {p0}, Lmm/DV;->formats()V
++
++    return-void
++
++    .line 60
++    :cond_8
+     sget-object v0, Lmm/DV;->act:Ljava/lang/ref/WeakReference;
+ 
+-    if-nez v0, :cond_6
++    if-nez v0, :cond_e
+ 
+     const/4 v0, 0x0
+ 
+-    goto :goto_e
++    goto :goto_16
+ 
+-    :cond_6
++    :cond_e
+     sget-object v0, Lmm/DV;->act:Ljava/lang/ref/WeakReference;
+ 
+     invoke-virtual {v0}, Ljava/lang/ref/WeakReference;->get()Ljava/lang/Object;
+@@ -1107,19 +1800,19 @@
+ 
+     check-cast v0, Landroid/app/Activity;
+ 
+-    .line 60
+-    :goto_e
+-    if-eqz v0, :cond_19
++    .line 61
++    :goto_16
++    if-eqz v0, :cond_21
+ 
+     invoke-virtual {v0}, Landroid/app/Activity;->isFinishing()Z
+ 
+     move-result v1
+ 
+-    if-nez v1, :cond_19
++    if-nez v1, :cond_21
+ 
+     invoke-virtual {v0}, Landroid/app/Activity;->recreate()V
+ 
+-    .line 61
+-    :cond_19
++    .line 62
++    :cond_21
+     return-void
+ .end method
