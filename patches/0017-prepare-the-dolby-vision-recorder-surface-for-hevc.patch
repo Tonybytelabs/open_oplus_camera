@@ -1,0 +1,28 @@
+prepare the dolby vision recorder surface for hevc
+
+classes7 mm/a0 (RecordProcessor) createVideoSurface builds a throw-away MediaRecorder to make the recorder input
+surface. With the video codec on H.265 and the Video HDR item on Dolby Vision, com.oplus.feature.video.hlg10.support
+reads false (mm/DV tenBit()) and it asked for MediaRecorder encoder 7 (Dolby Vision), which this phone does not
+have:
+  E MediaRecorder: prepare failed: -2147483648
+  E OCAM_RecordProcessor: createVideoSurface, configure or prepare fail
+  E CameraDeviceClient: endConfigure: Camera 0: Unsupported set of inputs/outputs provided
+and the camera hung. With H.264 that branch was never reached. The surface is now always prepared as HEVC Main 10,
+which is what the Dolby Vision recording uses (mm/DV over c2.qti.hevc.encoder). After: VID20261021213707.mp4,
+hevc Main 10 arib-std-b67, DOVI profile 8 level 4, 9.8 s.
+
+diff --git a/classes7/mm/a0.smali b/classes7/mm/a0.smali
+index f83ad84..67e2757 100644
+--- a/classes7/mm/a0.smali
++++ b/classes7/mm/a0.smali
+@@ -17283,6 +17283,10 @@
+     .line 292
+     move-result v8
+ 
++    # createVideoSurface: never MediaRecorder encoder 7 (Dolby Vision), this phone has none and prepare() fails;
++    # the Dolby Vision recording itself is the HEVC Main 10 encoder (mm/DV), so prepare the surface for that
++    const/4 v8, 0x1
++
+     .line 293
+     if-eqz v8, :cond_149
+ 
