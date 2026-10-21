@@ -1,0 +1,395 @@
+show hi-res in the photo quick settings
+
+The Hi-res option (pref_camera_high_resolution_key, values standard/standard_high) in the photo quick
+settings (s0.c(), classes7 com/oplus/camera/ui/menu/s0) had menu location 0, so CameraMenuContainerBottom
+(location mask 120) never drew it and Photo had no way to take a 48 MP picture, although photo mode lists
+it in its supportMenuPanel. It now has location 8 like HDR next to it, the icon array
+high_resolution_icons_48M (a bottom-panel option without one crashes in CameraMenuOption.K() with
+Resources$NotFoundException: Array resource ID #0x0) and the title camera_setting_submenu_high_res
+("Hi-res") instead of the unformatted "%1$1.0f MP".
+
+CameraMenuOptionBottom.u0() (classes7 zp/a) only marks an on/off option selected when its value is "on"
+("auto" for HDR) and never changes its icon, so Hi-res stayed grey with the crossed-out icon after being
+switched on. For pref_camera_high_resolution_key it now sets the icon of the current value (p()) and
+marks the option selected when the value is standard_high.
+
+diff --git b/classes7/com/oplus/camera/ui/menu/s0.smali c/classes7/com/oplus/camera/ui/menu/s0.smali
+index 94dfb2b..d91d049 100644
+--- b/classes7/com/oplus/camera/ui/menu/s0.smali
++++ c/classes7/com/oplus/camera/ui/menu/s0.smali
+@@ -4287,7 +4287,7 @@
+     .line 240
+     new-instance v3, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;
+ 
+-    const v14, 0x7f1105d4
++    const v14, 0x7f1105d0
+ 
+     invoke-virtual {v1, v14}, Landroid/content/res/Resources;->getString(I)Ljava/lang/String;
+ 
+@@ -4325,6 +4325,14 @@
+     .line 246
+     invoke-virtual {v3, v14}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->E(I)V
+ 
++    const v14, 0x7f0300b5
++
++    invoke-virtual {v3, v14}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->I(I)V
++
++    const/16 v14, 0x8
++
++    invoke-virtual {v3, v14}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->O(I)V
++
+     .line 247
+     invoke-virtual {v3}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->z()Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo;
+ 
+@@ -5321,16 +5329,16 @@
+ 
+     move-result v10
+ 
+-    if-eqz v10, :cond_a6a
++    if-eqz v10, :cond_a75
+ 
+     move v10, v5
+ 
+-    goto :goto_a6b
++    goto :goto_a76
+ 
+-    :cond_a6a
++    :cond_a75
+     move v10, v8
+ 
+-    :goto_a6b
++    :goto_a76
+     invoke-virtual {v3, v10}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->F(I)V
+ 
+     .line 419
+@@ -5730,7 +5738,7 @@
+ 
+     move-result v4
+ 
+-    if-eqz v4, :cond_c3c
++    if-eqz v4, :cond_c47
+ 
+     const v4, 0x7f030065
+ 
+@@ -5757,9 +5765,9 @@
+     .line 494
+     invoke-virtual {v3, v4}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->Z(I)V
+ 
+-    goto :goto_c5a
++    goto :goto_c65
+ 
+-    :cond_c3c
++    :cond_c47
+     const v4, 0x7f030196
+ 
+     .line 495
+@@ -5786,7 +5794,7 @@
+     invoke-virtual {v3, v4}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->Z(I)V
+ 
+     .line 500
+-    :goto_c5a
++    :goto_c65
+     invoke-virtual {v3, v2}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->O(I)V
+ 
+     .line 501
+@@ -6214,7 +6222,7 @@
+ 
+     const v10, 0x7f1107fc
+ 
+-    if-eqz v12, :cond_e41
++    if-eqz v12, :cond_e4c
+ 
+     .line 572
+     new-instance v3, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;
+@@ -6227,9 +6235,9 @@
+ 
+     invoke-direct {v3, v5, v12}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    goto :goto_e57
++    goto :goto_e62
+ 
+-    :cond_e41
++    :cond_e4c
+     const-string v5, "com.oplus.feature.video.hlg10.support"
+ 
+     .line 573
+@@ -6237,7 +6245,7 @@
+ 
+     move-result v5
+ 
+-    if-eqz v5, :cond_e57
++    if-eqz v5, :cond_e62
+ 
+     .line 574
+     new-instance v3, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;
+@@ -6252,8 +6260,8 @@
+ 
+     invoke-direct {v3, v12, v5}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+ 
+-    :cond_e57
+-    :goto_e57
++    :cond_e62
++    :goto_e62
+     const v5, 0x7f1106ef
+ 
+     const v12, 0x7f0300a4
+@@ -6432,7 +6440,7 @@
+ 
+     move-result v8
+ 
+-    if-eqz v8, :cond_f3e
++    if-eqz v8, :cond_f49
+ 
+     .line 605
+     invoke-virtual {v3, v6}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->H(I)V
+@@ -6465,13 +6473,13 @@
+     .line 611
+     invoke-virtual {v3, v8}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->E(I)V
+ 
+-    :goto_f3b
++    :goto_f46
+     const/16 v8, 0x10
+ 
+-    goto :goto_f63
++    goto :goto_f6e
+ 
+     .line 612
+-    :cond_f3e
++    :cond_f49
+     invoke-virtual {v3, v2}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->S(Z)V
+ 
+     const v8, 0x7f0301c6
+@@ -6502,10 +6510,10 @@
+     .line 618
+     invoke-virtual {v3, v8}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->E(I)V
+ 
+-    goto :goto_f3b
++    goto :goto_f46
+ 
+     .line 619
+-    :goto_f63
++    :goto_f6e
+     invoke-virtual {v3, v8}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->O(I)V
+ 
+     .line 620
+@@ -6525,23 +6533,23 @@
+ 
+     move-result v8
+ 
+-    if-eqz v8, :cond_f7f
++    if-eqz v8, :cond_f8a
+ 
+     const v8, 0x7f11026d
+ 
+-    :goto_f7a
++    :goto_f85
+     invoke-virtual {v1, v8}, Landroid/content/res/Resources;->getString(I)Ljava/lang/String;
+ 
+     move-result-object v8
+ 
+-    goto :goto_f83
++    goto :goto_f8e
+ 
+-    :cond_f7f
++    :cond_f8a
+     const v8, 0x7f110a31
+ 
+-    goto :goto_f7a
++    goto :goto_f85
+ 
+-    :goto_f83
++    :goto_f8e
+     const-string v10, "pref_soft_light_menu_switch"
+ 
+     invoke-direct {v3, v10, v8}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;-><init>(Ljava/lang/String;Ljava/lang/String;)V
+@@ -6573,16 +6581,16 @@
+ 
+     move-result v8
+ 
+-    if-eqz v8, :cond_faa
++    if-eqz v8, :cond_fb5
+ 
+     const v8, 0x7f030082
+ 
+-    goto :goto_fad
++    goto :goto_fb8
+ 
+-    :cond_faa
++    :cond_fb5
+     const v8, 0x7f03015e
+ 
+-    :goto_fad
++    :goto_fb8
+     invoke-virtual {v3, v8}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->I(I)V
+ 
+     const v8, 0x7f030160
+@@ -7024,14 +7032,14 @@
+ 
+     move-result-object v3
+ 
+-    if-eqz v3, :cond_11d5
++    if-eqz v3, :cond_11e0
+ 
+     .line 701
+     invoke-interface {v3}, Ljava/util/List;->size()I
+ 
+     move-result v3
+ 
+-    if-lez v3, :cond_11d5
++    if-lez v3, :cond_11e0
+ 
+     .line 702
+     new-instance v3, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;
+@@ -7087,10 +7095,10 @@
+ 
+     invoke-virtual {v0, v3}, Lcom/oplus/camera/ui/menu/s0;->addOptionInfo(Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo;)V
+ 
+-    goto :goto_120f
++    goto :goto_121a
+ 
+     .line 712
+-    :cond_11d5
++    :cond_11e0
+     new-instance v3, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;
+ 
+     const v8, 0x7f11024b
+@@ -7145,7 +7153,7 @@
+     invoke-virtual {v0, v3}, Lcom/oplus/camera/ui/menu/s0;->addOptionInfo(Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo;)V
+ 
+     .line 722
+-    :goto_120f
++    :goto_121a
+     new-instance v3, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;
+ 
+     const v8, 0x7f110579
+@@ -7858,22 +7866,22 @@
+ 
+     move-result v10
+ 
+-    if-ne v7, v10, :cond_1513
++    if-ne v7, v10, :cond_151e
+ 
+     const v10, 0x7f0300e7
+ 
+     .line 841
+     invoke-virtual {v8, v10}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->a0(I)V
+ 
+-    goto :goto_1519
++    goto :goto_1524
+ 
+-    :cond_1513
++    :cond_151e
+     const v10, 0x7f0300e6
+ 
+     .line 842
+     invoke-virtual {v8, v10}, Lcom/oplus/camera/ui/menu/PreferenceMenuOptionInfo$a;->a0(I)V
+ 
+-    :goto_1519
++    :goto_1524
+     const v10, 0x7f0300e8
+ 
+     .line 843
+diff --git b/classes7/zp/a.smali c/classes7/zp/a.smali
+index 311134a..e1bcd09 100644
+--- b/classes7/zp/a.smali
++++ c/classes7/zp/a.smali
+@@ -4705,7 +4705,7 @@
+     move-result v0
+ 
+     .line 11
+-    if-nez v0, :cond_bf
++    if-nez v0, :cond_e2
+ 
+     .line 12
+     .line 13
+@@ -4733,7 +4733,7 @@
+ 
+     .line 24
+     .line 25
+-    goto/16 :goto_bf
++    goto/16 :goto_e2
+ 
+     .line 26
+     .line 27
+@@ -4987,6 +4987,41 @@
+ 
+     .line 148
+     :cond_93
++    const-string v0, "pref_camera_high_resolution_key"
++
++    invoke-virtual {p0}, Lgq/h;->s()Ljava/lang/String;
++
++    move-result-object v2
++
++    invoke-virtual {v0, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v0
++
++    if-eqz v0, :cond_b6
++
++    iget-object v0, p0, Lzp/a;->B:Lcom/oplus/camera/common/view/BottomMenuIcon;
++
++    invoke-virtual {p0}, Lgq/h;->p()Landroid/graphics/drawable/Drawable;
++
++    move-result-object v2
++
++    invoke-virtual {v0, v2}, Landroidx/appcompat/widget/AppCompatImageView;->setImageDrawable(Landroid/graphics/drawable/Drawable;)V
++
++    const-string v2, "standard_high"
++
++    invoke-virtual {p0}, Lgq/h;->u()Ljava/lang/String;
++
++    move-result-object v3
++
++    invoke-virtual {v2, v3}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
++
++    move-result v2
++
++    invoke-virtual {v0, v2}, Lcom/oplus/camera/common/view/BottomMenuIcon;->setSelected(Z)V
++
++    goto :goto_df
++
++    :cond_b6
+     const-string v0, "pref_camera_hdr_mode_key"
+ 
+     .line 149
+@@ -5007,7 +5042,7 @@
+     move-result v0
+ 
+     .line 158
+-    if-eqz v0, :cond_af
++    if-eqz v0, :cond_d2
+ 
+     .line 159
+     .line 160
+@@ -5040,10 +5075,10 @@
+     .line 173
+     .line 174
+     .line 175
+-    goto :goto_bc
++    goto :goto_df
+ 
+     .line 176
+-    :cond_af
++    :cond_d2
+     iget-object v0, p0, Lzp/a;->B:Lcom/oplus/camera/common/view/BottomMenuIcon;
+ 
+     .line 177
+@@ -5069,14 +5104,14 @@
+     .line 187
+     .line 188
+     .line 189
+-    :goto_bc
++    :goto_df
+     invoke-virtual {p0}, Lzp/a;->t0()V
+ 
+     .line 190
+     .line 191
+     .line 192
+-    :cond_bf
+-    :goto_bf
++    :cond_e2
++    :goto_e2
+     return-void
+     .line 193
+     .line 194
