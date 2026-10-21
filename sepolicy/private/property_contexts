@@ -11,3 +11,6 @@ oplus.CTP.Tunningmode               u:object_r:exported_system_prop:s0
 
 # Region
 persist.sys.oppo.region             u:object_r:exported_system_prop:s0
+
+# Audio
+ro.oplus.audio.effect.type          u:object_r:exported_system_prop:s0
